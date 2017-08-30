@@ -15,8 +15,9 @@ build:
   skip: True   # [vc<14]
 
 requirements:
-  build:                   # [unix]
-    - {{ compiler('c') }}  # [unix]
+  build:                     # [unix]
+    - {{ compiler('c') }}    # [unix]
+    - {{ compiler('cxx') }}  # [unix]
   host:
     - bzip2                # [unix]
     - xz                   # [unix]
