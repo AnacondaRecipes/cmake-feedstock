@@ -19,17 +19,18 @@ build:
   detect_binary_files_with_prefix: true
 
 requirements:
-  build:                   # [unix]
-    - {{ compiler('c') }}  # [unix]
+  build:                     # [unix]
+    - {{ compiler('c') }}    # [unix]
+    - {{ compiler('cxx') }}  # [unix]
   host:
-    - bzip2                # [unix]
-    - xz                   # [unix]
-    - zlib                 # [unix]
-    - expat                # [unix]
-    - curl                 # [unix]
-    - ncurses 6.*          # [unix]
-    - libuv                # [unix]
-    - rhash                # [unix]
+    - bzip2                  # [unix]
+    - xz                     # [unix]
+    - zlib                   # [unix]
+    - expat                  # [unix]
+    - curl                   # [unix]
+    - ncurses 6.*            # [unix]
+    - libuv                  # [unix]
+    - rhash                  # [unix]
 
   run:
     - curl            # [unix]
