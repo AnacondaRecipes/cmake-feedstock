@@ -12,30 +12,28 @@ source:
 
 build:
   number: 0
-  msvc_compiler: 14.0
+  skip: True   # [vc<14]
 
 requirements:
-  build:
-    - toolchain
-    - bzip2 1.0.*  # [unix]
-    - curl >=7.44.0,<8  # [unix]
-    - expat 2.2.*  # [unix]
-    - ncurses 5.9*  # [unix]
-    - xz 5.2.*  # [unix]
-    - zlib 1.2.11  # [unix]
-    - libuv  # [unix]
-    - rhash  # [unix]
+  build:                   # [unix]
+    - {{ compiler('c') }}  # [unix]
+  host:
+    - bzip2                # [unix]
+    - xz                   # [unix]
+    - zlib                 # [unix]
+    - expat                # [unix]
+    - curl                 # [unix]
+    - ncurses              # [unix]
+    - libuv                # [unix]
+    - rhash                # [unix]
 
   run:
-    - bzip2 1.0.*  # [unix]
-    - curl >=7.44.0,<8  # [unix]
-    - expat 2.2.*  # [unix]
-    - ncurses 5.9*  # [unix]
-    - xz 5.2.*  # [unix]
-    - zlib 1.2.11  # [unix]
-    - libuv  # [unix]
-    - rhash  # [unix]
-    - vs2015_runtime  # [win]
+    - curl            # [unix]
+    - expat           # [unix]
+    - ncurses         # [unix]
+    - libuv           # [unix]
+    - rhash           # [unix]
+    - vs2013_runtime  # [win]
 
 test:
   files:
