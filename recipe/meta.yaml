@@ -10,32 +10,34 @@ source:
   fn: cmake-{{ version }}.tar.gz
   sha256: 57bebc6ca4d1d42c6385249d148d9216087e0fda57a47dc5c858790a70217d0c
 
+  url: https://cmake.org/files/v{{ major_minor }}/cmake-{{ version }}-win64-x64.zip       # [win64]
+  fn: cmake-{{ version }}-win64-x64.zip                                                   # [win64]
+  sha256: 86c0fde11caf22be08ee34971d49c91dbb1ef6315b2448f6725e9a05b753d251                # [win64]
+
 build:
   number: 0
-  msvc_compiler: 14.0
+  detect_binary_files_with_prefix: true
 
 requirements:
-  build:
-    - toolchain
-    - bzip2 1.0.*  # [unix]
-    - curl >=7.44.0,<8  # [unix]
-    - expat 2.2.*  # [unix]
-    - ncurses 5.9*  # [unix]
-    - xz 5.2.*  # [unix]
-    - zlib 1.2.11  # [unix]
-    - libuv  # [unix]
-    - rhash  # [unix]
+  build:                   # [unix]
+    - {{ compiler('c') }}  # [unix]
+  host:
+    - bzip2                # [unix]
+    - xz                   # [unix]
+    - zlib                 # [unix]
+    - expat                # [unix]
+    - curl                 # [unix]
+    - ncurses 6.*          # [unix]
+    - libuv                # [unix]
+    - rhash                # [unix]
 
   run:
-    - bzip2 1.0.*  # [unix]
-    - curl >=7.44.0,<8  # [unix]
-    - expat 2.2.*  # [unix]
-    - ncurses 5.9*  # [unix]
-    - xz 5.2.*  # [unix]
-    - zlib 1.2.11  # [unix]
-    - libuv  # [unix]
-    - rhash  # [unix]
-    - vs2015_runtime  # [win]
+    - curl            # [unix]
+    - expat           # [unix]
+    - ncurses 6.*     # [unix]
+    - libuv           # [unix]
+    - rhash           # [unix]
+    - vs2013_runtime  # [win]
 
 test:
   files:
