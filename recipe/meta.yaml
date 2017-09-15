@@ -23,9 +23,9 @@ build:
   detect_binary_files_with_prefix: true
 
 requirements:
-  build:                     # [unix]
-    - {{ compiler('c') }}    # [unix]
-    - {{ compiler('cxx') }}  # [unix]
+  build:
+    - {{ compiler('c') }}
+    - {{ compiler('cxx') }}
   host:
     - bzip2                  # [unix]
     - xz                     # [unix]
@@ -42,7 +42,6 @@ requirements:
     - ncurses 6.*     # [unix]
     - libuv           # [unix]
     - rhash           # [unix]
-    - vs2013_runtime  # [win]
 
 test:
   files:
