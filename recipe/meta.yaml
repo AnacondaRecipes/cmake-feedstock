@@ -16,8 +16,8 @@ build:
 
 requirements:
   build:
-    - {{ compiler('c') }}
-    - {{ compiler('cxx') }}
+    - {{ compiler('c') }}    # [unix]
+    - {{ compiler('cxx') }}  # [unix]
   host:
     - bzip2                # [unix]
     - xz                   # [unix]
