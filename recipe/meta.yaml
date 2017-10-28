@@ -12,7 +12,7 @@ source:
 
   url: https://cmake.org/files/v{{ major_minor }}/cmake-{{ version }}-win64-x64.zip       # [win64]
   fn: cmake-{{ version }}-win64-x64.zip                                                   # [win64]
-  sha256: 86c0fde11caf22be08ee34971d49c91dbb1ef6315b2448f6725e9a05b753d251                # [win64]
+  sha256: 63b74a0685b2dd1c5d76428fd915539db6353dd8804aed5683a533ee1a08196d                # [win64]
 
 build:
   number: 0
