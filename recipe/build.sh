@@ -1,9 +1,5 @@
 #!/bin/sh
 
-if [[ ${HOST} =~ .*darwin.* ]]; then
-  export LDFLAGS=${LDFLAGS_CC}
-fi
-
 ./bootstrap \
              --prefix="${PREFIX}" \
              --system-libs \
