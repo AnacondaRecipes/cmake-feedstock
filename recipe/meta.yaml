@@ -12,11 +12,10 @@ source:
 
   url: https://cmake.org/files/v{{ major_minor }}/cmake-{{ version }}-win64-x64.zip       # [win64]
   fn: cmake-{{ version }}-win64-x64.zip                                                   # [win64]
-  sha256: 63b74a0685b2dd1c5d76428fd915539db6353dd8804aed5683a533ee1a08196d                # [win64]
+  sha256: fd44d90d7eab48fbca0862e758d07f84e027ef68cb0d7a2d1ec865964ca58b12                # [win64]
 
 build:
   number: 0
-  detect_binary_files_with_prefix: true
 
 requirements:
   build:
@@ -27,17 +26,10 @@ requirements:
     - xz                     # [unix]
     - zlib                   # [unix]
     - expat                  # [unix]
-    - curl                   # [unix]
-    - ncurses 6.*            # [unix]
+    - libcurl                # [unix]
+    - ncurses                # [unix]
     - libuv                  # [unix]
     - rhash                  # [unix]
-
-  run:
-    - curl            # [unix]
-    - expat           # [unix]
-    - ncurses 6.*     # [unix]
-    - libuv           # [unix]
-    - rhash           # [unix]
 
 test:
   files:
