@@ -1,4 +1,5 @@
 
+<<<<<<< HEAD
 if "%ARCH%"=="32" (set CPU_ARCH=x86) else (set CPU_ARCH=x64)
 curl https://cmake.org/files/v%PKG_VERSION:~0,4%/cmake-%PKG_VERSION%-win%ARCH%-%CPU_ARCH%.zip -o cmake-win.zip
 7z x cmake-win.zip > nil
@@ -18,5 +19,8 @@ cmake -LAH -G"NMake Makefiles"                               ^
 if errorlevel 1 exit 1
 
 cmake --build . --config %CMAKE_CONFIG% --target install
+=======
+move share %LIBRARY_PREFIX%\
+>>>>>>> update to 3.10.2; change curl dep to libcurl
 if errorlevel 1 exit 1
 
