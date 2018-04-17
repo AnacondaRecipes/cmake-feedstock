@@ -6,21 +6,14 @@ package:
   version: {{ version }}
 
 source:
-  url: https://cmake.org/files/v{{ major_minor }}/cmake-{{ version }}.tar.gz
-  fn: cmake-{{ version }}.tar.gz
-  sha256: 57bebc6ca4d1d42c6385249d148d9216087e0fda57a47dc5c858790a70217d0c
-
   url: https://cmake.org/files/v{{ major_minor }}/cmake-{{ version }}.tar.gz              # [not win]
-  fn: cmake-{{ version }}.tar.gz                                                          # [not win]
-  sha256: 80d0faad4ab56de07aa21a7fc692c88c4ce6156d42b0579c6962004a70a3218b                # [not win]
+  sha256: 57bebc6ca4d1d42c6385249d148d9216087e0fda57a47dc5c858790a70217d0c                # [not win]
 
   url: https://cmake.org/files/v{{ major_minor }}/cmake-{{ version }}-win32-x86.zip       # [win32]
-  fn: cmake-{{ version }}-win32-x86.zip                                                   # [win32]
-  sha256: f5f7e41a21d0e9b655aca58498b08e17ecd27796bf82837e2c84435359169dd6                # [win32]
+  sha256: 415a24c0c1250514747ea3c1d45b1930bc51dc5d6acb01062e1d680051bb0ea9                # [win32]
 
   url: https://cmake.org/files/v{{ major_minor }}/cmake-{{ version }}-win64-x64.zip       # [win64]
-  fn: cmake-{{ version }}-win64-x64.zip                                                   # [win64]
-  sha256: fd44d90d7eab48fbca0862e758d07f84e027ef68cb0d7a2d1ec865964ca58b12                # [win64]
+  sha256: ed23c3d22e164fae7300c82db3e72eac4648e016eabdeace1bd573a9a6ecd218                # [win64]
 
 build:
   number: 0
@@ -32,13 +25,13 @@ requirements:
     - {{ compiler('cxx') }}  # [unix]
   host:
     - bzip2                  # [unix]
-    - xz                     # [unix]
-    - zlib                   # [unix]
     - expat                  # [unix]
+    - libuv                  # [unix]
     - libcurl                # [unix]
     - ncurses                # [unix]
-    - libuv                  # [unix]
     - rhash                  # [unix]
+    - xz                     # [unix]
+    - zlib                   # [unix]
 
 test:
   files:
