@@ -12,7 +12,7 @@ source:
     # Note, on Windows, we *do* build from source, but not fully. We use CMake's own CMakeLists.txt
     # There is not really any good reason to do it this way but it is what it is.
   - url: https://cmake.org/files/v{{ major_minor }}/cmake-{{ version }}-win32-x86.zip       # [win32]
-    sha256: 15a24c0c1250514747ea3c1d45b1930bc51dc5d6acb01062e1d680051bb0ea9                 # [win32]
+    sha256: 415a24c0c1250514747ea3c1d45b1930bc51dc5d6acb01062e1d680051bb0ea9                # [win32]
     folder: official-binary                                                                 # [win32]
 
   - url: https://cmake.org/files/v{{ major_minor }}/cmake-{{ version }}-win64-x64.zip       # [win64]
@@ -33,8 +33,11 @@ requirements:
     - zlib                   # [unix]
     - expat                  # [unix]
     - libcurl                # [unix]
+    # May be good to do this, but really build tools are too critical to risk any DSO incompat.
+    # - libarchive             # [unix]
     - ncurses                # [unix]
-    - libuv                  # [unix]
+    # May be good to do this, but really build tools are too critical to risk any DSO incompat.
+    # - libuv                  # [unix]
     - rhash                  # [unix]
 
 test:
