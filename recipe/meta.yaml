@@ -27,6 +27,7 @@ requirements:
   build:
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
+    - make                   # [unix]
   host:
     - bzip2                  # [unix]
     - xz                     # [unix]
@@ -38,6 +39,8 @@ requirements:
     - ncurses                # [unix]
     # May be good to do this, but really build tools are too critical to risk any DSO incompat.
     # - libuv                  # [unix]
+    - rhash                  # [unix]
+  run:
     - rhash                  # [unix]
 
 test:
