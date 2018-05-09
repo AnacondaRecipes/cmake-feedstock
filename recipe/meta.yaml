@@ -6,21 +6,27 @@ package:
   version: {{ version }}
 
 source:
-  url: https://cmake.org/files/v{{ major_minor }}/cmake-{{ version }}.tar.gz
-  fn: cmake-{{ version }}.tar.gz
-  sha256: 57bebc6ca4d1d42c6385249d148d9216087e0fda57a47dc5c858790a70217d0c
+  - url: https://cmake.org/files/v{{ major_minor }}/cmake-{{ version }}.tar.gz
+    sha256: 57bebc6ca4d1d42c6385249d148d9216087e0fda57a47dc5c858790a70217d0c
 
-  url: https://cmake.org/files/v{{ major_minor }}/cmake-{{ version }}-win64-x64.zip       # [win64]
-  fn: cmake-{{ version }}-win64-x64.zip                                                   # [win64]
-  sha256: fd44d90d7eab48fbca0862e758d07f84e027ef68cb0d7a2d1ec865964ca58b12                # [win64]
+    # Note, on Windows, we *do* build from source, but not fully. We use CMake's own CMakeLists.txt
+    # There is not really any good reason to do it this way but it is what it is.
+  - url: https://cmake.org/files/v{{ major_minor }}/cmake-{{ version }}-win32-x86.zip       # [win32]
+    sha256: 15a24c0c1250514747ea3c1d45b1930bc51dc5d6acb01062e1d680051bb0ea9                 # [win32]
+    folder: official-binary                                                                 # [win32]
+
+  - url: https://cmake.org/files/v{{ major_minor }}/cmake-{{ version }}-win64-x64.zip       # [win64]
+    sha256: ed23c3d22e164fae7300c82db3e72eac4648e016eabdeace1bd573a9a6ecd218                # [win64]
+    folder: official-binary                                                                 # [win64]
 
 build:
-  number: 0
+  number: 1
+  skip: True  # [win and vc<14]
 
 requirements:
   build:
-    - {{ compiler('c') }}    # [unix]
-    - {{ compiler('cxx') }}  # [unix]
+    - {{ compiler('c') }}
+    - {{ compiler('cxx') }}
   host:
     - bzip2                  # [unix]
     - xz                     # [unix]
@@ -59,6 +65,7 @@ extra:
     - jakirkham
     - jschueller
     - ocefpaf
+    - mingwandroid
     - msarahan
     - scopatz
     - tadeu
