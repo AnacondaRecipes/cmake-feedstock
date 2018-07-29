@@ -1,4 +1,4 @@
-{% set version = "3.11.1" %}
+{% set version = "3.12.0" %}
 {% set major_minor = '.'.join(version.split(".")[:2]) %}
 
 package:
@@ -7,20 +7,22 @@ package:
 
 source:
   - url: https://cmake.org/files/v{{ major_minor }}/cmake-{{ version }}.tar.gz
-    sha256: 57bebc6ca4d1d42c6385249d148d9216087e0fda57a47dc5c858790a70217d0c
+    sha256: d0781a90f6cdb9049d104ac16a150f9350b693498b9dea8a0331e799db6b9d69
+    patches:
+      - 0001-librhash-requires-libdl-for-dlopen.patch
 
     # Note, on Windows, we *do* build from source, but not fully. We use CMake's own CMakeLists.txt
     # There is not really any good reason to do it this way but it is what it is.
   - url: https://cmake.org/files/v{{ major_minor }}/cmake-{{ version }}-win32-x86.zip       # [win32]
-    sha256: 415a24c0c1250514747ea3c1d45b1930bc51dc5d6acb01062e1d680051bb0ea9                # [win32]
+    sha256: 4b6dac9c91e3ed611cc89f9b16912bf830d9e95eb06de3132c369a499c386df1                # [win32]
     folder: official-binary                                                                 # [win32]
 
   - url: https://cmake.org/files/v{{ major_minor }}/cmake-{{ version }}-win64-x64.zip       # [win64]
-    sha256: ed23c3d22e164fae7300c82db3e72eac4648e016eabdeace1bd573a9a6ecd218                # [win64]
+    sha256: b42e55410fa2629e3a876b4993fd6daea8e2629cb840d40c5a26247c923caf03                # [win64]
     folder: official-binary                                                                 # [win64]
 
 build:
-  number: 1
+  number: 0
   skip: True  # [win and vc<14]
 
 requirements:
