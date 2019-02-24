@@ -13,6 +13,9 @@ CMAKE_SYS_ISOLATION+=(-DFIND_LIBRARY_USE_LIB64_PATHS=NO)
 CMAKE_SYS_ISOLATION+=(-DFIND_LIBRARY_USE_LIBX32_PATHS=NO)
 
 declare -a CMAKE_PLATFORM_FLAGS
+if [[ $target_platform == osx-64 ]]; then
+  CMAKE_PLATFORM_FLAGS+=(-DCMAKE_OSX_SYSROOT=${CONDA_BUILD_SYSROOT})
+fi
 
 # Filter out -I${PREFIX}/include from CXXFLAGS as it causes issues with bad header
 # *and* macro name hygiene around libuv (queue.h / QUEUE etc, urgh).
@@ -22,10 +25,6 @@ if [[ "${CXXFLAGS}" =~ $re ]]; then
 fi
 if [[ "${CFLAGS}" =~ $re ]]; then
   export CFLAGS="${BASH_REMATCH[1]}${BASH_REMATCH[2]}"
-fi
-
-if [[ $target_platform == osx-64 ]]; then
-  CMAKE_PLATFORM_FLAGS+=(-DCMAKE_OSX_SYSROOT=${CONDA_BUILD_SYSROOT})
 fi
 
 ./bootstrap \

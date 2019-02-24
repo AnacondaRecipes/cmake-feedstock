@@ -17,11 +17,11 @@ source:
     # Note, on Windows, we *do* build from source, but not fully. We use CMake's own CMakeLists.txt
     # There is not really any good reason to do it this way but it is what it is.
   - url: https://cmake.org/files/v{{ major_minor }}/cmake-{{ version }}-win32-x86.zip       # [win32]
-    sha256: fde814282b798a8064aab8c44ddf2f7a25e1139b5a2b3a255adedacfca5706cd                # [win32]
+    sha256: 31efdf788f0129d5cd65e3bcb1e3b1202ad31c2b4cfde4168d24282ae4153d3e                # [win32]
     folder: official-binary                                                                 # [win32]
 
   - url: https://cmake.org/files/v{{ major_minor }}/cmake-{{ version }}-win64-x64.zip       # [win64]
-    sha256: 25c8dbe3e81095463b0d6ccefd836275791299502e3ed5eccf695e118a6d031b                # [win64]
+    sha256: 6d334ca9b42c3e125889d562cfdb9c43a429b5ab329d33a7ab6e14e559aa7822                # [win64]
     folder: official-binary                                                                 # [win64]
 
 build:
