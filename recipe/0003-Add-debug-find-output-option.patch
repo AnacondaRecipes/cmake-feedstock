@@ -1,4 +1,4 @@
-From 97f1a80ef1494d83aee60cc5b2df8791e831fd81 Mon Sep 17 00:00:00 2001
+From db57624c9816e8678d0f07c8c1f790d860a63927 Mon Sep 17 00:00:00 2001
 From: Ray Donnelly <mingw.android@gmail.com>
 Date: Sun, 24 Feb 2019 00:32:20 +0100
 Subject: [PATCH 3/3] Add --debug-find-output option
@@ -15,10 +15,10 @@ a command-line switch to using `-DCMAKE_FIND_DEBUG_MODE=ON`
  Source/cmFindLibraryCommand.h   |  1 +
  Source/cmServerDictionary.h     |  1 +
  Source/cmServerProtocol.cxx     |  9 ++++++---
- Source/cmake.cxx                |  3 +++
+ Source/cmake.cxx                |  4 ++++
  Source/cmake.h                  |  5 +++++
  Source/cmakemain.cxx            |  1 +
- 8 files changed, 47 insertions(+), 10 deletions(-)
+ 8 files changed, 48 insertions(+), 10 deletions(-)
 
 diff --git a/Help/manual/cmake.1.rst b/Help/manual/cmake.1.rst
 index f3b81ecb68..dd119a2785 100644
@@ -202,10 +202,18 @@ index 203ee93e42..9a39d4d39a 100644
    setBool(request, kTRACE_EXPAND_KEY, [cm](bool e) { cm->SetTraceExpand(e); });
    setBool(request, kWARN_UNINITIALIZED_KEY,
 diff --git a/Source/cmake.cxx b/Source/cmake.cxx
-index ab783c7da1..349e8e936b 100644
+index ab783c7da1..8afaaf70f1 100644
 --- a/Source/cmake.cxx
 +++ b/Source/cmake.cxx
-@@ -716,6 +716,9 @@ void cmake::SetArgs(const std::vector<std::string>& args)
+@@ -138,6 +138,7 @@ cmake::cmake(Role role, cmState::Mode mode)
+   this->WarnUnusedCli = true;
+   this->CheckSystemVars = false;
+   this->DebugOutput = false;
++  this->DebugFindOutput = false;
+   this->DebugTryCompile = false;
+   this->ClearBuildSystem = false;
+   this->FileComparison = new cmFileTimeComparison;
+@@ -716,6 +717,9 @@ void cmake::SetArgs(const std::vector<std::string>& args)
      } else if (arg.find("--debug-output", 0) == 0) {
        std::cout << "Running with debug output on.\n";
        this->SetDebugOutputOn(true);
