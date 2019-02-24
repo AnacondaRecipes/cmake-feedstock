@@ -1,4 +1,4 @@
-From db57624c9816e8678d0f07c8c1f790d860a63927 Mon Sep 17 00:00:00 2001
+From b375b68d8d92a42e9e736e60dec1edb4ccc95fb7 Mon Sep 17 00:00:00 2001
 From: Ray Donnelly <mingw.android@gmail.com>
 Date: Sun, 24 Feb 2019 00:32:20 +0100
 Subject: [PATCH 3/3] Add --debug-find-output option
@@ -11,14 +11,14 @@ I do not mind changing this over to be more like that, but I do prefer
 a command-line switch to using `-DCMAKE_FIND_DEBUG_MODE=ON`
 ---
  Help/manual/cmake.1.rst         |  3 +++
- Source/cmFindLibraryCommand.cxx | 34 ++++++++++++++++++++++++++-------
+ Source/cmFindLibraryCommand.cxx | 38 +++++++++++++++++++++++++--------
  Source/cmFindLibraryCommand.h   |  1 +
  Source/cmServerDictionary.h     |  1 +
- Source/cmServerProtocol.cxx     |  9 ++++++---
+ Source/cmServerProtocol.cxx     |  9 +++++---
  Source/cmake.cxx                |  4 ++++
  Source/cmake.h                  |  5 +++++
  Source/cmakemain.cxx            |  1 +
- 8 files changed, 48 insertions(+), 10 deletions(-)
+ 8 files changed, 50 insertions(+), 12 deletions(-)
 
 diff --git a/Help/manual/cmake.1.rst b/Help/manual/cmake.1.rst
 index f3b81ecb68..dd119a2785 100644
@@ -35,7 +35,7 @@ index f3b81ecb68..dd119a2785 100644
   message(send_error ) calls.
  
 diff --git a/Source/cmFindLibraryCommand.cxx b/Source/cmFindLibraryCommand.cxx
-index e38f42b935..53d184a897 100644
+index e38f42b935..307afcaca4 100644
 --- a/Source/cmFindLibraryCommand.cxx
 +++ b/Source/cmFindLibraryCommand.cxx
 @@ -14,9 +14,23 @@
@@ -71,20 +71,23 @@ index e38f42b935..53d184a897 100644
    }
  }
  
-@@ -160,7 +174,7 @@ void cmFindLibraryCommand::AddArchitecturePath(
+@@ -159,16 +173,16 @@ void cmFindLibraryCommand::AddArchitecturePath(
+       this->SearchPaths.push_back(std::move(dirX));
        std::string msg = "find_library(" + this->VariableName +
          ") added replacement path " + dirX +
-         " to PATH_SUFFIXES for architechture suffix '" + suffix + "'";
+-        " to PATH_SUFFIXES for architechture suffix '" + suffix + "'";
 -      cmSystemTools::Message(msg.c_str());
++        " to PATH_SUFFIXES for architecture suffix '" + suffix + "'";
 +      this->DebugMessage(msg);
      }
  
      if (use_dir) {
-@@ -168,7 +182,7 @@ void cmFindLibraryCommand::AddArchitecturePath(
+       this->SearchPaths.push_back(dir);
        std::string msg = "find_library(" + this->VariableName +
          ") added replacement path " + dir +
-         " to PATH_SUFFIXES for architechture suffix '" + suffix + "'";
+-        " to PATH_SUFFIXES for architechture suffix '" + suffix + "'";
 -      cmSystemTools::Message(msg.c_str());
++        " to PATH_SUFFIXES for architecture suffix '" + suffix + "'";
 +      this->DebugMessage(msg);
      }
    }
