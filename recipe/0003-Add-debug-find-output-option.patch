@@ -1,4 +1,4 @@
-From b375b68d8d92a42e9e736e60dec1edb4ccc95fb7 Mon Sep 17 00:00:00 2001
+From 72a26bf8d497e918ee4606eedad16110dd367e96 Mon Sep 17 00:00:00 2001
 From: Ray Donnelly <mingw.android@gmail.com>
 Date: Sun, 24 Feb 2019 00:32:20 +0100
 Subject: [PATCH 3/3] Add --debug-find-output option
@@ -9,16 +9,18 @@ There's also CMAKE_FIND_DEBUG_MODE in Source/cmFindPackageCommand.cxx
 
 I do not mind changing this over to be more like that, but I do prefer
 a command-line switch to using `-DCMAKE_FIND_DEBUG_MODE=ON`
+
+Also fix typo of architechture => architecture
 ---
  Help/manual/cmake.1.rst         |  3 +++
- Source/cmFindLibraryCommand.cxx | 38 +++++++++++++++++++++++++--------
+ Source/cmFindLibraryCommand.cxx | 40 ++++++++++++++++++++++++---------
  Source/cmFindLibraryCommand.h   |  1 +
  Source/cmServerDictionary.h     |  1 +
  Source/cmServerProtocol.cxx     |  9 +++++---
  Source/cmake.cxx                |  4 ++++
  Source/cmake.h                  |  5 +++++
  Source/cmakemain.cxx            |  1 +
- 8 files changed, 50 insertions(+), 12 deletions(-)
+ 8 files changed, 51 insertions(+), 13 deletions(-)
 
 diff --git a/Help/manual/cmake.1.rst b/Help/manual/cmake.1.rst
 index f3b81ecb68..dd119a2785 100644
@@ -35,7 +37,7 @@ index f3b81ecb68..dd119a2785 100644
   message(send_error ) calls.
  
 diff --git a/Source/cmFindLibraryCommand.cxx b/Source/cmFindLibraryCommand.cxx
-index e38f42b935..307afcaca4 100644
+index e38f42b935..07ea16f333 100644
 --- a/Source/cmFindLibraryCommand.cxx
 +++ b/Source/cmFindLibraryCommand.cxx
 @@ -14,9 +14,23 @@
@@ -62,9 +64,12 @@ index e38f42b935..307afcaca4 100644
  cmFindLibraryCommand::cmFindLibraryCommand()
  {
    this->EnvironmentPath = "LIB";
-@@ -94,7 +108,7 @@ void cmFindLibraryCommand::AddArchitecturePaths(const char* suffix)
+@@ -92,9 +106,9 @@ void cmFindLibraryCommand::AddArchitecturePaths(const char* suffix)
+     this->AddArchitecturePath(o, 0, suffix);
+     std::string msg = "find_library(" + this->VariableName +
        ") removed original suffix " + o +
-       " from PATH_SUFFIXES while adding architechture paths for suffix '" +
+-      " from PATH_SUFFIXES while adding architechture paths for suffix '" +
++      " from PATH_SUFFIXES while adding architecture paths for suffix '" +
        suffix + "'";
 -    cmSystemTools::Message(msg.c_str());
 +    this->DebugMessage(msg);
