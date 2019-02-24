@@ -1,15 +1,18 @@
-{% set version = "3.12.2" %}
+# {% set version = "3.13.4" %}
+{% set version = "3.14.0-rc2" %}
 {% set major_minor = '.'.join(version.split(".")[:2]) %}
 
 package:
   name: cmake
-  version: {{ version }}
+  version: {{ version.replace('-','_') }}
 
 source:
   - url: https://cmake.org/files/v{{ major_minor }}/cmake-{{ version }}.tar.gz
-    sha256: 0f97485799e51a7070cc11494f3e02349b0fc3a24cc12b082e737bf67a0581a4
+    sha256: 2a1c6b5264a30e1c1ba697cc3492f849dcb35ec6d640620d07512907fbe49999
     patches:
       - 0001-librhash-requires-libdl-for-dlopen.patch
+      - 0002-Add-debug-logging-to-find_library-work-in-progress.patch
+      - 0003-Add-debug-find-output-option.patch
 
     # Note, on Windows, we *do* build from source, but not fully. We use CMake's own CMakeLists.txt
     # There is not really any good reason to do it this way but it is what it is.
@@ -24,6 +27,8 @@ source:
 build:
   number: 0
   skip: True  # [win and vc<14]
+  ignore_run_exports:
+    - rhash
 
 requirements:
   build:
@@ -36,13 +41,11 @@ requirements:
     - zlib                   # [unix]
     - expat                  # [unix]
     - libcurl                # [unix]
+    - libarchive
+    - ncurses                # [osx]
     # May be good to do this, but really build tools are too critical to risk any DSO incompat.
-    # - libarchive             # [unix]
-    - ncurses                # [unix]
-    # May be good to do this, but really build tools are too critical to risk any DSO incompat.
+    # Remember to change to -DCMAKE_USE_SYSTEM_LIBRARY_LIBUV=YES in build.sh if you depend on libuv
     # - libuv                  # [unix]
-    - rhash                  # [unix]
-  run:
     - rhash                  # [unix]
 
 test:

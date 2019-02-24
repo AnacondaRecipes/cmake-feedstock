@@ -1,0 +1,86 @@
+From f67826fdf14f06e3ff615113baefbe5eef038c61 Mon Sep 17 00:00:00 2001
+From: Chris Wilson <chris+github@qwirx.com>
+Date: Sat, 25 Aug 2018 21:32:00 +0100
+Subject: [PATCH 2/3] Add debug logging to find_library (work in progress)
+
+---
+ Source/cmFindLibraryCommand.cxx | 28 ++++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
+
+diff --git a/Source/cmFindLibraryCommand.cxx b/Source/cmFindLibraryCommand.cxx
+index 73d602de71..e38f42b935 100644
+--- a/Source/cmFindLibraryCommand.cxx
++++ b/Source/cmFindLibraryCommand.cxx
+@@ -90,6 +90,11 @@ void cmFindLibraryCommand::AddArchitecturePaths(const char* suffix)
+   original.swap(this->SearchPaths);
+   for (std::string const& o : original) {
+     this->AddArchitecturePath(o, 0, suffix);
++    std::string msg = "find_library(" + this->VariableName +
++      ") removed original suffix " + o +
++      " from PATH_SUFFIXES while adding architechture paths for suffix '" +
++      suffix + "'";
++    cmSystemTools::Message(msg.c_str());
+   }
+ }
+ 
+@@ -152,10 +157,18 @@ void cmFindLibraryCommand::AddArchitecturePath(
+     if (use_dirX) {
+       dirX += "/";
+       this->SearchPaths.push_back(std::move(dirX));
++      std::string msg = "find_library(" + this->VariableName +
++        ") added replacement path " + dirX +
++        " to PATH_SUFFIXES for architechture suffix '" + suffix + "'";
++      cmSystemTools::Message(msg.c_str());
+     }
+ 
+     if (use_dir) {
+       this->SearchPaths.push_back(dir);
++      std::string msg = "find_library(" + this->VariableName +
++        ") added replacement path " + dir +
++        " to PATH_SUFFIXES for architechture suffix '" + suffix + "'";
++      cmSystemTools::Message(msg.c_str());
+     }
+   }
+ }
+@@ -351,9 +364,15 @@ bool cmFindLibraryHelper::CheckDirectoryForName(std::string const& path,
+     this->TestPath = path;
+     this->TestPath += name.Raw;
+     if (cmSystemTools::FileExists(this->TestPath, true)) {
++      std::string msg = "find_library found " + name.Raw + " in " + path;
++      cmSystemTools::Message(msg.c_str());
+       this->BestPath = cmSystemTools::CollapseFullPath(this->TestPath);
+       cmSystemTools::ConvertToUnixSlashes(this->BestPath);
+       return true;
++    } else {
++      std::string msg =
++        "find_library did not find " + name.Raw + " in " + path;
++      cmSystemTools::Message(msg.c_str());
+     }
+   }
+ 
+@@ -377,6 +396,9 @@ bool cmFindLibraryHelper::CheckDirectoryForName(std::string const& path,
+       this->TestPath = path;
+       this->TestPath += origName;
+       if (!cmSystemTools::FileIsDirectory(this->TestPath)) {
++        std::string msg = "find_library found " + name.Raw +
++          this->SuffixRegexStr + " in " + dir;
++        cmSystemTools::Message(msg.c_str());
+         // This is a matching file.  Check if it is better than the
+         // best name found so far.  Earlier prefixes are preferred,
+         // followed by earlier suffixes.  For OpenBSD, shared library
+@@ -403,6 +425,12 @@ bool cmFindLibraryHelper::CheckDirectoryForName(std::string const& path,
+     }
+   }
+ 
++  if (this->BestPath.empty()) {
++    std::string msg = "find_library did not find " + name.Raw +
++      this->SuffixRegexStr + " in " + dir;
++    cmSystemTools::Message(msg.c_str());
++  }
++
+   // Use the best candidate found in this directory, if any.
+   return !this->BestPath.empty();
+ }
+-- 
+2.17.2 (Apple Git-113)
+
