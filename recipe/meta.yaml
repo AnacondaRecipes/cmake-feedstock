@@ -12,7 +12,11 @@ source:
     patches:
       - 0001-librhash-requires-libdl-for-dlopen.patch
       - 0002-Add-debug-logging-to-find_library-work-in-progress.patch
-      - 0003-Add-debug-find-output-option.patch
+      - 0003-Apple-Clang.cmake-does-not-want-lib32-lib64-nor-libx.patch
+      - 0004-Default-to-NO_SYSTEM_ENVIRONMENT_PATH-when-CMAKE_CRO.patch
+#  - path: ~/conda/cmake
+#    path_via_symlink: True
+    folder: cmake
 
     # Note, on Windows, we *do* build from source, but not fully. We use CMake's own CMakeLists.txt
     # There is not really any good reason to do it this way but it is what it is.
@@ -25,7 +29,7 @@ source:
     folder: official-binary                                                                 # [win64]
 
 build:
-  number: 0
+  number: 1
   skip: True  # [win and vc<14]
   ignore_run_exports:
     - rhash

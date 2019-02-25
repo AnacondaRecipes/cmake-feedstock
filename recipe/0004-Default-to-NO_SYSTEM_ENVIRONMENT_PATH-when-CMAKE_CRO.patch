@@ -1,0 +1,51 @@
+From 5f6e348108036022da82d5693363d745bacb5410 Mon Sep 17 00:00:00 2001
+From: Ray Donnelly <mingw.android@gmail.com>
+Date: Mon, 25 Feb 2019 23:06:00 +0100
+Subject: [PATCH 4/4] Default to NO_SYSTEM_ENVIRONMENT_PATH when
+ CMAKE_CROSSCOMPILING
+
+---
+ Source/cmFindBase.cxx | 27 +++++++++++++++++++++++++++
+ 1 file changed, 27 insertions(+)
+
+diff --git a/Source/cmFindBase.cxx b/Source/cmFindBase.cxx
+index 9874b19a41..83e4ed393a 100644
+--- a/Source/cmFindBase.cxx
++++ b/Source/cmFindBase.cxx
+@@ -172,6 +172,33 @@ bool cmFindBase::ParseArguments(std::vector<std::string> const& argsIn)
+                                shortArgs.begin() + 1, shortArgs.end());
+   }
+ 
++  /* We never want build-system libraries (located from being on PATH) to get found.
++     We definitely do not want this when cross-compiling and probably do not want it
++     at all. It is unclear what is shared between this and cmFindPackageCommand where
++     PATH probably needs to be inspected (because cross-compilers will live on it).
++     Reading the docs we see:
++     Search the standard system environment variables. This can be skipped if
++     NO_SYSTEM_ENVIRONMENT_PATH is an argument.
++     Directories in INCLUDE. On Windows hosts: <prefix>/include/<arch>
++     .. this last part, directories in INCLUDE, could be problematic. Need to see if
++     we can split this. CMake really needs a cleaner separation of build and host.
++     In this instance, PATH and INCLUDE are both looked in when !NO_SYSTEM_ENVIRONMENT_PATH
++     but PATH is an aspect of the build machine, executables on PATH can be run on your computer
++     while INCLUDE may be an aspect of the host machine. */
++  if (this->Makefile->IsOn("CMAKE_CROSSCOMPILING")) {
++    if (this->DebugModeWanted()) {
++      std::string msg = "cmFindBase::ParseArguments find_*(" + args[0] +
++        "), CMAKE_CROSSCOMPILING is on so disabling NO_SYSTEM_ENVIRONMENT_PATH "
++        " by default. "
++        "Please see: https://cmake.org/cmake/help/latest/command/find_path.html";
++      cmFindCommon_IssueMessage(this->Makefile, msg);
++    }
++    // this->NoCMakePath = true;
++    // this->NoCMakeEnvironmentPath = true;
++    this->NoSystemEnvironmentPath = true;
++    // this->NoCMakeSystemPath = true;
++  }
++
+   this->ExpandPaths();
+ 
+   this->ComputeFinalPaths();
+-- 
+2.20.1
+

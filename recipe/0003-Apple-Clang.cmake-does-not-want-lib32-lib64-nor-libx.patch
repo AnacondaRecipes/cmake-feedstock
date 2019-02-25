@@ -1,0 +1,25 @@
+From 4b5aca3980f6b397584c7ed381d54ef95f505dec Mon Sep 17 00:00:00 2001
+From: Ray Donnelly <mingw.android@gmail.com>
+Date: Mon, 25 Feb 2019 22:52:02 +0100
+Subject: [PATCH 3/4] Apple-Clang.cmake does not want lib32, lib64 nor libx32
+ libpath suffixes
+
+---
+ Modules/Platform/Apple-Clang.cmake | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/Modules/Platform/Apple-Clang.cmake b/Modules/Platform/Apple-Clang.cmake
+index 0681bfb059..95be50bb47 100644
+--- a/Modules/Platform/Apple-Clang.cmake
++++ b/Modules/Platform/Apple-Clang.cmake
+@@ -29,4 +29,7 @@ macro(__apple_compiler_clang lang)
+   else()
+     set(CMAKE_${lang}_OSX_DEPLOYMENT_TARGET_FLAG "-mmacosx-version-min=")
+   endif()
++  set_property(GLOBAL PROPERTY FIND_LIBRARY_USE_LIB32_PATHS FALSE)
++  set_property(GLOBAL PROPERTY FIND_LIBRARY_USE_LIB64_PATHS FALSE)
++  set_property(GLOBAL PROPERTY FIND_LIBRARY_USE_LIBX32_PATHS FALSE)
+ endmacro()
+-- 
+2.20.1
+

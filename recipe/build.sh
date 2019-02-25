@@ -1,5 +1,8 @@
 #!/bin/sh
 
+mkdir build
+pushd build
+
 declare -a CMAKE_SYS_ISOLATION
 CMAKE_SYS_ISOLATION+=(-DCMAKE_FIND_ROOT_PATH_INCLUDE=ONLY)
 CMAKE_SYS_ISOLATION+=(-DCMAKE_FIND_ROOT_PATH_LIBRARY=ONLY)
@@ -27,21 +30,22 @@ if [[ "${CFLAGS}" =~ $re ]]; then
   export CFLAGS="${BASH_REMATCH[1]}${BASH_REMATCH[2]}"
 fi
 
-./bootstrap \
-             --prefix="${PREFIX}" \
-             --system-libs \
-             --no-qt-gui \
-             --no-system-libuv \
-             --no-system-libarchive \
-             --no-system-jsoncpp \
-             --parallel=${CPU_COUNT} \
-             -- \
-             -DCMAKE_FIND_ROOT_PATH="${PREFIX}" \
-             -DCMAKE_INSTALL_RPATH="${PREFIX}/lib" \
-             "${CMAKE_SYS_ISOLATION[@]}" \
-             "${CMAKE_PLATFORM_FLAGS[@]}" \
-             -DCMAKE_CXX=${CXX} \
-             -DCMAKE_CC=${CC} \
-             -DCMAKE_BUILD_TYPE:STRING=Release \
-             -DCMAKE_USE_SYSTEM_LIBRARY_LIBUV=NO
+../cmake/bootstrap \
+  --prefix="${PREFIX}" \
+  --system-libs \
+  --no-qt-gui \
+  --no-system-libuv \
+  --no-system-libarchive \
+  --no-system-jsoncpp \
+  --parallel=${CPU_COUNT} \
+  -- \
+  -DCMAKE_FIND_ROOT_PATH="${PREFIX}" \
+  -DCMAKE_INSTALL_RPATH="${PREFIX}/lib" \
+  "${CMAKE_SYS_ISOLATION[@]}" \
+  "${CMAKE_PLATFORM_FLAGS[@]}" \
+  -DCMAKE_CXX=${CXX} \
+  -DCMAKE_CC=${CC} \
+  -DCMAKE_BUILD_TYPE:STRING=Release \
+  -DCMAKE_USE_SYSTEM_LIBRARY_LIBUV=NO
 make install -j${CPU_COUNT} ${VERBOSE_CM}
+

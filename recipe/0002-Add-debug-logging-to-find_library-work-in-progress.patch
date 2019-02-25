@@ -1,86 +1,555 @@
-From f67826fdf14f06e3ff615113baefbe5eef038c61 Mon Sep 17 00:00:00 2001
+From 3491778aa62f4c3adbefb242f2caaaeb6e44fd4c Mon Sep 17 00:00:00 2001
 From: Chris Wilson <chris+github@qwirx.com>
 Date: Sat, 25 Aug 2018 21:32:00 +0100
-Subject: [PATCH 2/3] Add debug logging to find_library (work in progress)
+Subject: [PATCH 2/4] Add debug logging to find_library (work in progress)
 
+Add --debug-find-output option
+
+Builds on https://gitlab.kitware.com/cmake/cmake/merge_requests/2313
+
+There's also CMAKE_FIND_DEBUG_MODE in Source/cmFindPackageCommand.cxx
+
+I do not mind changing this over to be more like that, but I do prefer
+a command-line switch to using `-DCMAKE_FIND_DEBUG_MODE=ON`
+
+Address some comments
 ---
- Source/cmFindLibraryCommand.cxx | 28 ++++++++++++++++++++++++++++
- 1 file changed, 28 insertions(+)
+ Help/manual/cmake.1.rst         |  3 ++
+ Source/cmFindBase.cxx           | 43 +++++++++++++++++++-----
+ Source/cmFindCommon.cxx         | 23 +++++++++++++
+ Source/cmFindCommon.h           | 10 ++++++
+ Source/cmFindLibraryCommand.cxx | 59 ++++++++++++++++++++++++++++++---
+ Source/cmFindPackageCommand.cxx | 29 ++++++++++++----
+ Source/cmFindPackageCommand.h   |  1 -
+ Source/cmServerDictionary.h     |  1 +
+ Source/cmServerProtocol.cxx     |  9 +++--
+ Source/cmake.cxx                |  4 +++
+ Source/cmake.h                  |  5 +++
+ Source/cmakemain.cxx            |  1 +
+ 12 files changed, 166 insertions(+), 22 deletions(-)
 
+diff --git a/Help/manual/cmake.1.rst b/Help/manual/cmake.1.rst
+index f3b81ecb68..7b706eda6a 100644
+--- a/Help/manual/cmake.1.rst
++++ b/Help/manual/cmake.1.rst
+@@ -210,6 +210,9 @@ Options
+ ``--debug-output``
+  Put cmake in a debug mode.
+ 
++``--debug-find``
++ Put cmake find in a debug mode.
++
+  Print extra information during the cmake run like stack traces with
+  message(send_error ) calls.
+ 
+diff --git a/Source/cmFindBase.cxx b/Source/cmFindBase.cxx
+index f92f66e239..9874b19a41 100644
+--- a/Source/cmFindBase.cxx
++++ b/Source/cmFindBase.cxx
+@@ -108,17 +108,40 @@ bool cmFindBase::ParseArguments(std::vector<std::string> const& argsIn)
+       this->NoDefaultPath = true;
+     } else if (this->CheckCommonArgument(args[j])) {
+       doing = DoingNone;
++    } else {
+       // Some common arguments were accidentally supported by CMake
+       // 2.4 and 2.6.0 in the short-hand form of the command, so we
+       // must support it even though it is not documented.
+-    } else if (doing == DoingNames) {
+-      this->Names.push_back(args[j]);
+-    } else if (doing == DoingPaths) {
+-      this->UserGuessArgs.push_back(args[j]);
+-    } else if (doing == DoingHints) {
+-      this->UserHintsArgs.push_back(args[j]);
+-    } else if (doing == DoingPathSuffixes) {
+-      this->AddPathSuffix(args[j]);
++      if (doing == DoingNames) {
++        this->Names.push_back(args[j]);
++      } else if (doing == DoingPaths) {
++        this->UserGuessArgs.push_back(args[j]);
++      } else if (doing == DoingHints) {
++        this->UserHintsArgs.push_back(args[j]);
++      } else if (doing == DoingPathSuffixes) {
++        this->AddPathSuffix(args[j]);
++      }
++      if (this->DebugModeWanted()) {
++        std::string msg = "cmFindBase::ParseArguments added ";
++        switch (doing) {
++          case DoingNames:
++            msg += " NAME ";
++            break;
++          case DoingPaths:
++            msg += " PATH ";
++            break;
++          case DoingPathSuffixes:
++            msg += " PATHSUFFIXES ";
++            break;
++          case DoingHints:
++            msg += " HINTS ";
++            break;
++          default:
++            break;
++        }
++        msg += args[j];
++        cmFindCommon_IssueMessage(this->Makefile, msg);
++      }
+     }
+   }
+ 
+@@ -148,10 +171,14 @@ bool cmFindBase::ParseArguments(std::vector<std::string> const& argsIn)
+     this->UserGuessArgs.insert(this->UserGuessArgs.end(),
+                                shortArgs.begin() + 1, shortArgs.end());
+   }
++
+   this->ExpandPaths();
+ 
+   this->ComputeFinalPaths();
+ 
++  if (this->DebugModeWanted())
++    this->PrintFindStuff();
++
+   return true;
+ }
+ 
+diff --git a/Source/cmFindCommon.cxx b/Source/cmFindCommon.cxx
+index 9aaa000f9b..596c6e4675 100644
+--- a/Source/cmFindCommon.cxx
++++ b/Source/cmFindCommon.cxx
+@@ -9,6 +9,8 @@
+ #include "cmMakefile.h"
+ #include "cmSystemTools.h"
+ 
++#include "cmake.h"
++
+ cmFindCommon::PathGroup cmFindCommon::PathGroup::All("ALL");
+ cmFindCommon::PathLabel cmFindCommon::PathLabel::PackageRoot(
+   "PackageName_ROOT");
+@@ -46,10 +48,31 @@ cmFindCommon::cmFindCommon()
+   this->SearchAppBundleLast = false;
+ 
+   this->InitializeSearchPathGroups();
++
++  this->DebugMode = false;
+ }
+ 
+ cmFindCommon::~cmFindCommon() = default;
+ 
++void cmFindCommon_IssueMessage(const cmMakefile* mf, std::string const& msg)
++{
++  if (mf)
++    mf->IssueMessage(MessageType::LOG, msg);
++}
++
++void cmFindCommon::DebugMessage(std::string const& msg)
++{
++  if (this->DebugMode) {
++    cmFindCommon_IssueMessage(this->GetMakefile(), msg);
++  }
++}
++
++bool cmFindCommon::DebugModeWanted()
++{
++  return this->Makefile->IsOn("CMAKE_FIND_DEBUG_MODE") ||
++    this->Makefile->GetCMakeInstance()->GetDebugFindOutput();
++}
++
+ void cmFindCommon::InitializeSearchPathGroups()
+ {
+   std::vector<PathLabel>* labels;
+diff --git a/Source/cmFindCommon.h b/Source/cmFindCommon.h
+index 89ff1741da..6aa1a80816 100644
+--- a/Source/cmFindCommon.h
++++ b/Source/cmFindCommon.h
+@@ -90,6 +90,10 @@ protected:
+   /** Compute the current default bundle/framework search policy.  */
+   void SelectDefaultMacMode();
+ 
++  /** The `InitialPass` functions of the child classes should set
++      this->DebugMode to the result of this.  */
++  bool DebugModeWanted();
++
+   // Path arguments prior to path manipulation routines
+   std::vector<std::string> UserHintsArgs;
+   std::vector<std::string> UserGuessArgs;
+@@ -100,6 +104,8 @@ protected:
+   bool CheckCommonArgument(std::string const& arg);
+   void AddPathSuffix(std::string const& arg);
+ 
++  void DebugMessage(std::string const& msg);
++  bool DebugMode;
+   bool NoDefaultPath;
+   bool NoPackageRootPath;
+   bool NoCMakePath;
+@@ -126,4 +132,8 @@ protected:
+   bool SearchAppBundleLast;
+ };
+ 
++/* Convenience function (DRY) for cmFindLibraryHelper to use */
++extern void cmFindCommon_IssueMessage(const cmMakefile* mf,
++                                      std::string const& msg);
++
+ #endif
 diff --git a/Source/cmFindLibraryCommand.cxx b/Source/cmFindLibraryCommand.cxx
-index 73d602de71..e38f42b935 100644
+index 73d602de71..9685d7f502 100644
 --- a/Source/cmFindLibraryCommand.cxx
 +++ b/Source/cmFindLibraryCommand.cxx
-@@ -90,6 +90,11 @@ void cmFindLibraryCommand::AddArchitecturePaths(const char* suffix)
+@@ -44,6 +44,8 @@ bool cmFindLibraryCommand::InitialPass(std::vector<std::string> const& argsIn,
+     return true;
+   }
+ 
++  this->DebugMode = DebugModeWanted();
++
+   // add custom lib<qual> paths instead of using fixed lib32, lib64 or
+   // libx32
+   if (const char* customLib = this->Makefile->GetDefinition(
+@@ -90,6 +92,13 @@ void cmFindLibraryCommand::AddArchitecturePaths(const char* suffix)
    original.swap(this->SearchPaths);
    for (std::string const& o : original) {
      this->AddArchitecturePath(o, 0, suffix);
-+    std::string msg = "find_library(" + this->VariableName +
-+      ") removed original suffix " + o +
-+      " from PATH_SUFFIXES while adding architechture paths for suffix '" +
-+      suffix + "'";
-+    cmSystemTools::Message(msg.c_str());
++    if (this->DebugMode) {
++      std::string msg = "find_library(" + this->VariableName +
++        ") removed original suffix " + o +
++        " from PATH_SUFFIXES while adding architecture paths for suffix '" +
++        suffix + "'";
++      this->DebugMessage(msg);
++    }
    }
  }
  
-@@ -152,10 +157,18 @@ void cmFindLibraryCommand::AddArchitecturePath(
+@@ -152,10 +161,22 @@ void cmFindLibraryCommand::AddArchitecturePath(
      if (use_dirX) {
        dirX += "/";
        this->SearchPaths.push_back(std::move(dirX));
-+      std::string msg = "find_library(" + this->VariableName +
-+        ") added replacement path " + dirX +
-+        " to PATH_SUFFIXES for architechture suffix '" + suffix + "'";
-+      cmSystemTools::Message(msg.c_str());
++      if (this->DebugMode) {
++        std::string msg = "find_library(" + this->VariableName +
++          ") added replacement path " + dirX +
++          " to PATH_SUFFIXES for architecture suffix '" + suffix + "'";
++        this->DebugMessage(msg);
++      }
      }
  
      if (use_dir) {
        this->SearchPaths.push_back(dir);
-+      std::string msg = "find_library(" + this->VariableName +
-+        ") added replacement path " + dir +
-+        " to PATH_SUFFIXES for architechture suffix '" + suffix + "'";
-+      cmSystemTools::Message(msg.c_str());
++      if (this->DebugMode) {
++        std::string msg = "find_library(" + this->VariableName +
++          ") added replacement path " + dir +
++          " to PATH_SUFFIXES for architecture suffix '" + suffix + "'";
++        this->DebugMessage(msg);
++      }
      }
    }
  }
-@@ -351,9 +364,15 @@ bool cmFindLibraryHelper::CheckDirectoryForName(std::string const& path,
+@@ -177,7 +198,7 @@ std::string cmFindLibraryCommand::FindLibrary()
+ 
+ struct cmFindLibraryHelper
+ {
+-  cmFindLibraryHelper(cmMakefile* mf);
++  cmFindLibraryHelper(cmMakefile* mf, bool dm);
+ 
+   // Context information.
+   cmMakefile* Makefile;
+@@ -196,6 +217,8 @@ struct cmFindLibraryHelper
+   // Support for OpenBSD shared library naming: lib<name>.so.<major>.<minor>
+   bool OpenBSD;
+ 
++  bool DebugMode;
++
+   // Current names under consideration.
+   struct Name
+   {
+@@ -225,10 +248,12 @@ struct cmFindLibraryHelper
+   void SetName(std::string const& name);
+   bool CheckDirectory(std::string const& path);
+   bool CheckDirectoryForName(std::string const& path, Name& name);
++  void DebugMessage(std::string const& msg);
+ };
+ 
+-cmFindLibraryHelper::cmFindLibraryHelper(cmMakefile* mf)
++cmFindLibraryHelper::cmFindLibraryHelper(cmMakefile* mf, bool dm)
+   : Makefile(mf)
++  , DebugMode(dm)
+ {
+   this->GG = this->Makefile->GetGlobalGenerator();
+ 
+@@ -351,9 +376,17 @@ bool cmFindLibraryHelper::CheckDirectoryForName(std::string const& path,
      this->TestPath = path;
      this->TestPath += name.Raw;
      if (cmSystemTools::FileExists(this->TestPath, true)) {
-+      std::string msg = "find_library found " + name.Raw + " in " + path;
-+      cmSystemTools::Message(msg.c_str());
++      if (this->DebugMode) {
++        std::string msg = "find_library found " + name.Raw + " in " + path;
++        this->DebugMessage(msg);
++      }
        this->BestPath = cmSystemTools::CollapseFullPath(this->TestPath);
        cmSystemTools::ConvertToUnixSlashes(this->BestPath);
        return true;
-+    } else {
++    } else if (this->DebugMode) {
 +      std::string msg =
 +        "find_library did not find " + name.Raw + " in " + path;
-+      cmSystemTools::Message(msg.c_str());
++      this->DebugMessage(msg);
      }
    }
  
-@@ -377,6 +396,9 @@ bool cmFindLibraryHelper::CheckDirectoryForName(std::string const& path,
+@@ -377,6 +410,11 @@ bool cmFindLibraryHelper::CheckDirectoryForName(std::string const& path,
        this->TestPath = path;
        this->TestPath += origName;
        if (!cmSystemTools::FileIsDirectory(this->TestPath)) {
-+        std::string msg = "find_library found " + name.Raw +
-+          this->SuffixRegexStr + " in " + dir;
-+        cmSystemTools::Message(msg.c_str());
++        if (this->DebugMode) {
++          std::string msg = "find_library found " + name.Raw +
++            this->SuffixRegexStr + " in " + dir;
++          this->DebugMessage(msg);
++        }
          // This is a matching file.  Check if it is better than the
          // best name found so far.  Earlier prefixes are preferred,
          // followed by earlier suffixes.  For OpenBSD, shared library
-@@ -403,6 +425,12 @@ bool cmFindLibraryHelper::CheckDirectoryForName(std::string const& path,
+@@ -403,10 +441,23 @@ bool cmFindLibraryHelper::CheckDirectoryForName(std::string const& path,
      }
    }
  
 +  if (this->BestPath.empty()) {
 +    std::string msg = "find_library did not find " + name.Raw +
 +      this->SuffixRegexStr + " in " + dir;
-+    cmSystemTools::Message(msg.c_str());
++    if (this->DebugMode) {
++      this->DebugMessage(msg);
++    }
 +  }
 +
    // Use the best candidate found in this directory, if any.
    return !this->BestPath.empty();
  }
+ 
++void cmFindLibraryHelper::DebugMessage(std::string const& msg)
++{
++  cmFindCommon_IssueMessage(this->Makefile, msg);
++}
++
+ std::string cmFindLibraryCommand::FindNormalLibrary()
+ {
+   if (this->NamesPerDir) {
+@@ -418,7 +469,7 @@ std::string cmFindLibraryCommand::FindNormalLibrary()
+ std::string cmFindLibraryCommand::FindNormalLibraryNamesPerDir()
+ {
+   // Search for all names in each directory.
+-  cmFindLibraryHelper helper(this->Makefile);
++  cmFindLibraryHelper helper(this->Makefile, this->DebugMode);
+   for (std::string const& n : this->Names) {
+     helper.AddName(n);
+   }
+@@ -435,7 +486,7 @@ std::string cmFindLibraryCommand::FindNormalLibraryNamesPerDir()
+ std::string cmFindLibraryCommand::FindNormalLibraryDirsPerName()
+ {
+   // Search the entire path for each name.
+-  cmFindLibraryHelper helper(this->Makefile);
++  cmFindLibraryHelper helper(this->Makefile, this->DebugMode);
+   for (std::string const& n : this->Names) {
+     // Switch to searching for this name.
+     helper.SetName(n);
+diff --git a/Source/cmFindPackageCommand.cxx b/Source/cmFindPackageCommand.cxx
+index 0d22ed8e77..b359b56561 100644
+--- a/Source/cmFindPackageCommand.cxx
++++ b/Source/cmFindPackageCommand.cxx
+@@ -156,8 +156,7 @@ bool cmFindPackageCommand::InitialPass(std::vector<std::string> const& args,
+     this->RequiredCMakeVersion = CMake_VERSION_ENCODE(v[0], v[1], v[2]);
+   }
+ 
+-  // Check for debug mode.
+-  this->DebugMode = this->Makefile->IsOn("CMAKE_FIND_DEBUG_MODE");
++  this->DebugMode = DebugModeWanted();
+ 
+   // Lookup target architecture, if any.
+   if (const char* arch =
+@@ -1154,24 +1153,38 @@ void cmFindPackageCommand::ComputePrefixes()
+       this->FillPrefixesPackageRoot();
+     }
+     if (!this->NoCMakePath) {
++      if (this->DebugMode)
++        this->DebugMessage("FillPrefixesCMakeVariable()\n");
+       this->FillPrefixesCMakeVariable();
+     }
+     if (!this->NoCMakeEnvironmentPath) {
++      if (this->DebugMode)
++        this->DebugMessage("FillPrefixesCMakeEnvironment()\n");
+       this->FillPrefixesCMakeEnvironment();
+     }
+   }
+   this->FillPrefixesUserHints();
++  if (this->DebugMode)
++    this->DebugMessage("FillPrefixesUserHints()\n");
+   if (!this->NoDefaultPath) {
+     if (!this->NoSystemEnvironmentPath) {
++      if (this->DebugMode)
++        this->DebugMessage("FillPrefixesSystemEnvironment()\n");
+       this->FillPrefixesSystemEnvironment();
+     }
+     if (!this->NoUserRegistry) {
++      if (this->DebugMode)
++        this->DebugMessage("FillPrefixesUserRegistry()\n");
+       this->FillPrefixesUserRegistry();
+     }
+     if (!this->NoCMakeSystemPath) {
++      if (this->DebugMode)
++        this->DebugMessage("FillPrefixesCMakeSystemVariable()\n");
+       this->FillPrefixesCMakeSystemVariable();
+     }
+     if (!this->NoSystemRegistry) {
++      if (this->DebugMode)
++        this->DebugMessage("FillPrefixesSystemRegistry()\n");
+       this->FillPrefixesSystemRegistry();
+     }
+   }
+@@ -1509,7 +1522,8 @@ bool cmFindPackageCommand::FindConfigFile(std::string const& dir,
+     file += "/";
+     file += c;
+     if (this->DebugMode) {
+-      fprintf(stderr, "Checking file [%s]\n", file.c_str());
++      std::string msg = "Checking file [" + file + "]\n";
++      this->DebugMessage(msg);
+     }
+     if (cmSystemTools::FileExists(file, true) && this->CheckVersion(file)) {
+       // Allow resolving symlinks when the config file is found through a link
+@@ -2027,7 +2041,8 @@ bool cmFindPackageCommand::SearchPrefix(std::string const& prefix_in)
+ {
+   assert(!prefix_in.empty() && prefix_in.back() == '/');
+   if (this->DebugMode) {
+-    fprintf(stderr, "Checking prefix [%s]\n", prefix_in.c_str());
++    std::string msg = "Checking prefix [" + prefix_in + "]\n";
++    this->DebugMessage(msg);
+   }
+ 
+   // Skip this if the prefix does not exist.
+@@ -2183,7 +2198,8 @@ bool cmFindPackageCommand::SearchFrameworkPrefix(std::string const& prefix_in)
+ {
+   assert(!prefix_in.empty() && prefix_in.back() == '/');
+   if (this->DebugMode) {
+-    fprintf(stderr, "Checking framework prefix [%s]\n", prefix_in.c_str());
++    std::string msg = "Checking framework prefix [" + prefix_in + "]\n";
++    this->DebugMessage(msg);
+   }
+ 
+   // Strip the trailing slash because the path generator is about to
+@@ -2244,7 +2260,8 @@ bool cmFindPackageCommand::SearchAppBundlePrefix(std::string const& prefix_in)
+ {
+   assert(!prefix_in.empty() && prefix_in.back() == '/');
+   if (this->DebugMode) {
+-    fprintf(stderr, "Checking bundle prefix [%s]\n", prefix_in.c_str());
++    std::string msg = "Checking bundle prefix [" + prefix_in + "]\n";
++    this->DebugMessage(msg);
+   }
+ 
+   // Strip the trailing slash because the path generator is about to
+diff --git a/Source/cmFindPackageCommand.h b/Source/cmFindPackageCommand.h
+index a11d253048..f2ec2ad345 100644
+--- a/Source/cmFindPackageCommand.h
++++ b/Source/cmFindPackageCommand.h
+@@ -174,7 +174,6 @@ private:
+   bool UseFindModules;
+   bool NoUserRegistry;
+   bool NoSystemRegistry;
+-  bool DebugMode;
+   bool UseLib32Paths;
+   bool UseLib64Paths;
+   bool UseLibx32Paths;
+diff --git a/Source/cmServerDictionary.h b/Source/cmServerDictionary.h
+index 961e4b7ea8..f452c13ad4 100644
+--- a/Source/cmServerDictionary.h
++++ b/Source/cmServerDictionary.h
+@@ -33,6 +33,7 @@ static const std::string kCHECK_SYSTEM_VARS_KEY = "checkSystemVars";
+ static const std::string kCMAKE_ROOT_DIRECTORY_KEY = "cmakeRootDirectory";
+ static const std::string kCOOKIE_KEY = "cookie";
+ static const std::string kDEBUG_OUTPUT_KEY = "debugOutput";
++static const std::string kDEBUG_FIND_OUTPUT_KEY = "debugFindOutput";
+ static const std::string kERROR_MESSAGE_KEY = "errorMessage";
+ static const std::string kEXTRA_GENERATOR_KEY = "extraGenerator";
+ static const std::string kGENERATOR_KEY = "generator";
+diff --git a/Source/cmServerProtocol.cxx b/Source/cmServerProtocol.cxx
+index 203ee93e42..9a39d4d39a 100644
+--- a/Source/cmServerProtocol.cxx
++++ b/Source/cmServerProtocol.cxx
+@@ -628,6 +628,7 @@ cmServerResponse cmServerProtocol1::ProcessGlobalSettings(
+   obj[kCAPABILITIES_KEY] = cm->ReportCapabilitiesJson(true);
+ 
+   obj[kDEBUG_OUTPUT_KEY] = cm->GetDebugOutput();
++  obj[kDEBUG_FIND_OUTPUT_KEY] = cm->GetDebugFindOutput();
+   obj[kTRACE_KEY] = cm->GetTrace();
+   obj[kTRACE_EXPAND_KEY] = cm->GetTraceExpand();
+   obj[kWARN_UNINITIALIZED_KEY] = cm->GetWarnUninitialized();
+@@ -658,9 +659,9 @@ cmServerResponse cmServerProtocol1::ProcessSetGlobalSettings(
+   const cmServerRequest& request)
+ {
+   const std::vector<std::string> boolValues = {
+-    kDEBUG_OUTPUT_KEY,       kTRACE_KEY,       kTRACE_EXPAND_KEY,
+-    kWARN_UNINITIALIZED_KEY, kWARN_UNUSED_KEY, kWARN_UNUSED_CLI_KEY,
+-    kCHECK_SYSTEM_VARS_KEY
++    kDEBUG_OUTPUT_KEY,    kDEBUG_FIND_OUTPUT_KEY,  kTRACE_KEY,
++    kTRACE_EXPAND_KEY,    kWARN_UNINITIALIZED_KEY, kWARN_UNUSED_KEY,
++    kWARN_UNUSED_CLI_KEY, kCHECK_SYSTEM_VARS_KEY
+   };
+   for (std::string const& i : boolValues) {
+     if (!request.Data[i].isNull() && !request.Data[i].isBool()) {
+@@ -673,6 +674,8 @@ cmServerResponse cmServerProtocol1::ProcessSetGlobalSettings(
+ 
+   setBool(request, kDEBUG_OUTPUT_KEY,
+           [cm](bool e) { cm->SetDebugOutputOn(e); });
++  setBool(request, kDEBUG_FIND_OUTPUT_KEY,
++          [cm](bool e) { cm->SetDebugFindOutputOn(e); });
+   setBool(request, kTRACE_KEY, [cm](bool e) { cm->SetTrace(e); });
+   setBool(request, kTRACE_EXPAND_KEY, [cm](bool e) { cm->SetTraceExpand(e); });
+   setBool(request, kWARN_UNINITIALIZED_KEY,
+diff --git a/Source/cmake.cxx b/Source/cmake.cxx
+index ab783c7da1..8afaaf70f1 100644
+--- a/Source/cmake.cxx
++++ b/Source/cmake.cxx
+@@ -138,6 +138,7 @@ cmake::cmake(Role role, cmState::Mode mode)
+   this->WarnUnusedCli = true;
+   this->CheckSystemVars = false;
+   this->DebugOutput = false;
++  this->DebugFindOutput = false;
+   this->DebugTryCompile = false;
+   this->ClearBuildSystem = false;
+   this->FileComparison = new cmFileTimeComparison;
+@@ -716,6 +717,9 @@ void cmake::SetArgs(const std::vector<std::string>& args)
+     } else if (arg.find("--debug-output", 0) == 0) {
+       std::cout << "Running with debug output on.\n";
+       this->SetDebugOutputOn(true);
++    } else if (arg.find("--debug-find-output", 0) == 0) {
++      std::cout << "Running with debug output on for the `find` commands.\n";
++      this->SetDebugFindOutputOn(true);
+     } else if (arg.find("--trace-expand", 0) == 0) {
+       std::cout << "Running with expanded trace output on.\n";
+       this->SetTrace(true);
+diff --git a/Source/cmake.h b/Source/cmake.h
+index 6fa2d3a947..a4ab009d31 100644
+--- a/Source/cmake.h
++++ b/Source/cmake.h
+@@ -335,6 +335,10 @@ public:
+   bool GetDebugOutput() { return this->DebugOutput; }
+   void SetDebugOutputOn(bool b) { this->DebugOutput = b; }
+ 
++  // Do we want debug output from the find commands during the cmake run.
++  bool GetDebugFindOutput() { return this->DebugFindOutput; }
++  void SetDebugFindOutputOn(bool b) { this->DebugFindOutput = b; }
++
+   // Do we want trace output during the cmake run.
+   bool GetTrace() { return this->Trace; }
+   void SetTrace(bool b) { this->Trace = b; }
+@@ -489,6 +493,7 @@ private:
+   ProgressCallbackType ProgressCallback;
+   WorkingMode CurrentWorkingMode;
+   bool DebugOutput;
++  bool DebugFindOutput;
+   bool Trace;
+   bool TraceExpand;
+   bool WarnUninitialized;
+diff --git a/Source/cmakemain.cxx b/Source/cmakemain.cxx
+index 09068f8c76..314b9be284 100644
+--- a/Source/cmakemain.cxx
++++ b/Source/cmakemain.cxx
+@@ -89,6 +89,7 @@ static const char* cmDocumentationOptions[][2] = {
+     "Do not delete the try_compile build tree. Only "
+     "useful on one try_compile at a time." },
+   { "--debug-output", "Put cmake in a debug mode." },
++  { "--debug-find", "Put cmake find in a debug mode." },
+   { "--trace", "Put cmake in trace mode." },
+   { "--trace-expand", "Put cmake in trace mode with variable expansion." },
+   { "--trace-source=<file>",
 -- 
-2.17.2 (Apple Git-113)
+2.20.1
 
