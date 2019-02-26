@@ -1,24 +1,12 @@
 #!/bin/sh
 
-mkdir build
+mkdir build || true
 pushd build
+source "${RECIPE_DIR}/share/conda-cmake/conda-env-vars.sh"
 
-declare -a CMAKE_SYS_ISOLATION
-CMAKE_SYS_ISOLATION+=(-DCMAKE_FIND_ROOT_PATH_INCLUDE=ONLY)
-CMAKE_SYS_ISOLATION+=(-DCMAKE_FIND_ROOT_PATH_LIBRARY=ONLY)
-CMAKE_SYS_ISOLATION+=(-DCMAKE_FIND_ROOT_PATH_PROGRAM=ONLY)
-CMAKE_SYS_ISOLATION+=(-DCMAKE_FIND_ROOT_PATH_PACKAGE=ONLY)
-
-# Maybe? -DFIND_LIBRARY_USE_LIB64_PATHS=NO may present trouble for CDTs.
-CMAKE_SYS_ISOLATION+=(-DCMAKE_FIND_LIBRARY_CUSTOM_LIB_SUFFIX=)
-CMAKE_SYS_ISOLATION+=(-DFIND_LIBRARY_USE_LIB32_PATHS=NO)
-CMAKE_SYS_ISOLATION+=(-DFIND_LIBRARY_USE_LIB64_PATHS=NO)
-CMAKE_SYS_ISOLATION+=(-DFIND_LIBRARY_USE_LIBX32_PATHS=NO)
-
-declare -a CMAKE_PLATFORM_FLAGS
-if [[ $target_platform == osx-64 ]]; then
-  CMAKE_PLATFORM_FLAGS+=(-DCMAKE_OSX_SYSROOT=${CONDA_BUILD_SYSROOT})
-fi
+# Remove any --* option as they break building CMake itself!
+declare -a CONDA_CMAKE_DEFAULTS_NO_DASH_DASH_OPTS
+for elem in "${CONDA_CMAKE_DEFAULTS[@]}"; do [[ $elem =~ --.* ]] || CONDA_CMAKE_DEFAULTS_NO_DASH_DASH_OPTS+=("$elem"); done
 
 # Filter out -I${PREFIX}/include from CXXFLAGS as it causes issues with bad header
 # *and* macro name hygiene around libuv (queue.h / QUEUE etc, urgh).
@@ -39,13 +27,11 @@ fi
   --no-system-jsoncpp \
   --parallel=${CPU_COUNT} \
   -- \
-  -DCMAKE_FIND_ROOT_PATH="${PREFIX}" \
-  -DCMAKE_INSTALL_RPATH="${PREFIX}/lib" \
-  "${CMAKE_SYS_ISOLATION[@]}" \
-  "${CMAKE_PLATFORM_FLAGS[@]}" \
-  -DCMAKE_CXX=${CXX} \
-  -DCMAKE_CC=${CC} \
-  -DCMAKE_BUILD_TYPE:STRING=Release \
+  "${CONDA_CMAKE_DEFAULTS_NO_DASH_DASH_OPTS[@]}" \
+  "${CONDA_CMAKE_TOOLCHAIN[@]}" \
   -DCMAKE_USE_SYSTEM_LIBRARY_LIBUV=NO
 make install -j${CPU_COUNT} ${VERBOSE_CM}
 
+# Copy conda-cmake config/build meta files.
+mkdir "${PREFIX}/share/conda-cmake"
+cp -rf "${RECIPE_DIR}"/share/conda-cmake/*.sh "${RECIPE_DIR}"/share/cmake/*.cmake "${PREFIX}/share/cmake-conda"

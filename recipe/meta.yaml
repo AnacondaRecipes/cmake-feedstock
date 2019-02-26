@@ -11,6 +11,7 @@ source:
     sha256: 2a1c6b5264a30e1c1ba697cc3492f849dcb35ec6d640620d07512907fbe49999
     patches:
       - 0001-librhash-requires-libdl-for-dlopen.patch
+      # Combines a few patches by Chris Wilson and myself (Ray).
       - 0002-Add-debug-logging-to-find_library-work-in-progress.patch
       - 0003-Apple-Clang.cmake-does-not-want-lib32-lib64-nor-libx.patch
       - 0004-Default-to-NO_SYSTEM_ENVIRONMENT_PATH-when-CMAKE_CRO.patch
@@ -29,7 +30,7 @@ source:
     folder: official-binary                                                                 # [win64]
 
 build:
-  number: 1
+  number: 2
   skip: True  # [win and vc<14]
   ignore_run_exports:
     - rhash
