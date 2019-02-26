@@ -2,7 +2,7 @@
 
 mkdir build || true
 pushd build
-source "${RECIPE_DIR}/share/conda-cmake/conda-env-vars.sh"
+source "${RECIPE_DIR}/share/cmake.conda/conda-env-vars.sh"
 
 # Remove any --* option as they break building CMake itself!
 declare -a CONDA_CMAKE_DEFAULTS_NO_DASH_DASH_OPTS
@@ -33,5 +33,5 @@ fi
 make install -j${CPU_COUNT} ${VERBOSE_CM}
 
 # Copy conda-cmake config/build meta files.
-mkdir "${PREFIX}/share/conda-cmake"
-cp -rf "${RECIPE_DIR}"/share/conda-cmake/*.sh "${RECIPE_DIR}"/share/cmake/*.cmake "${PREFIX}/share/cmake-conda"
+mkdir "${PREFIX}/share/cmake.conda"
+cp -rf "${RECIPE_DIR}"/share/cmake.conda/*.sh "${RECIPE_DIR}"/share/cmake.conda/*.cmake "${PREFIX}/share/cmake.conda"
