@@ -1,25 +1,23 @@
-From 5f6e348108036022da82d5693363d745bacb5410 Mon Sep 17 00:00:00 2001
+From d89ec85ddc6a0c2f5c5f27c661a8b30297fa2e18 Mon Sep 17 00:00:00 2001
 From: Ray Donnelly <mingw.android@gmail.com>
 Date: Mon, 25 Feb 2019 23:06:00 +0100
 Subject: [PATCH 4/4] Default to NO_SYSTEM_ENVIRONMENT_PATH when
  CMAKE_CROSSCOMPILING
 
 ---
- Source/cmFindBase.cxx | 27 +++++++++++++++++++++++++++
- 1 file changed, 27 insertions(+)
+ Source/cmFindBase.cxx | 25 +++++++++++++++++++++++++
+ 1 file changed, 25 insertions(+)
 
 diff --git a/Source/cmFindBase.cxx b/Source/cmFindBase.cxx
-index 9874b19a41..83e4ed393a 100644
+index fdc78ba5ea..07d9ab773a 100644
 --- a/Source/cmFindBase.cxx
 +++ b/Source/cmFindBase.cxx
-@@ -172,6 +172,33 @@ bool cmFindBase::ParseArguments(std::vector<std::string> const& argsIn)
+@@ -171,6 +171,31 @@ bool cmFindBase::ParseArguments(std::vector<std::string> const& argsIn)
+     this->UserGuessArgs.insert(this->UserGuessArgs.end(),
                                 shortArgs.begin() + 1, shortArgs.end());
    }
- 
-+  /* We never want build-system libraries (located from being on PATH) to get found.
-+     We definitely do not want this when cross-compiling and probably do not want it
-+     at all. It is unclear what is shared between this and cmFindPackageCommand where
-+     PATH probably needs to be inspected (because cross-compilers will live on it).
++  /* We do not want build system libraries (located from being on PATH) to get found.
++     We definitely do not want this when cross-compiling.
 +     Reading the docs we see:
 +     Search the standard system environment variables. This can be skipped if
 +     NO_SYSTEM_ENVIRONMENT_PATH is an argument.
@@ -47,5 +45,5 @@ index 9874b19a41..83e4ed393a 100644
  
    this->ComputeFinalPaths();
 -- 
-2.20.1
+2.17.2 (Apple Git-113)
 

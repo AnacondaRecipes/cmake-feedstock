@@ -4,7 +4,13 @@ mkdir build || true
 pushd build
 source "${RECIPE_DIR}/share/cmake.conda/conda-env-vars.sh"
 
-# Remove any --* option as they break building CMake itself!
+echo "CONDA_CMAKE_DEFAULTS is ${CONDA_CMAKE_DEFAULTS[@]}"
+echo "CONDA_CMAKE_TOOLCHAIN is ${CONDA_CMAKE_TOOLCHAIN[@]}"
+
+# Remove any --* option as they break building CMake itself
+# .. or to be exact, they do while you are adding
+# the feature and that command-line switch to CMake (--debug-find)
+# Still this serves as an example for filtering CONDA_CMAKE_DEFAULTS.
 declare -a CONDA_CMAKE_DEFAULTS_NO_DASH_DASH_OPTS
 for elem in "${CONDA_CMAKE_DEFAULTS[@]}"; do [[ $elem =~ --.* ]] || CONDA_CMAKE_DEFAULTS_NO_DASH_DASH_OPTS+=("$elem"); done
 
@@ -33,5 +39,5 @@ fi
 make install -j${CPU_COUNT} ${VERBOSE_CM}
 
 # Copy conda-cmake config/build meta files.
-mkdir "${PREFIX}/share/cmake.conda"
-cp -rf "${RECIPE_DIR}"/share/cmake.conda/*.sh "${RECIPE_DIR}"/share/cmake.conda/*.cmake "${PREFIX}/share/cmake.conda"
+mkdir -p "${PREFIX}/share/cmake.conda" || true
+cp -rf "${RECIPE_DIR}"/share/cmake.conda/*.sh "${RECIPE_DIR}"/share/cmake.conda/*.cmake "${PREFIX}/share/cmake.conda/"

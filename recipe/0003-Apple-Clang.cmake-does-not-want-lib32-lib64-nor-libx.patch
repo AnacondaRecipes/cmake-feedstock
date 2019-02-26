@@ -1,4 +1,4 @@
-From 4b5aca3980f6b397584c7ed381d54ef95f505dec Mon Sep 17 00:00:00 2001
+From 1107be12c395cb96a310049a89d9da4a72832325 Mon Sep 17 00:00:00 2001
 From: Ray Donnelly <mingw.android@gmail.com>
 Date: Mon, 25 Feb 2019 22:52:02 +0100
 Subject: [PATCH 3/4] Apple-Clang.cmake does not want lib32, lib64 nor libx32
@@ -21,5 +21,5 @@ index 0681bfb059..95be50bb47 100644
 +  set_property(GLOBAL PROPERTY FIND_LIBRARY_USE_LIBX32_PATHS FALSE)
  endmacro()
 -- 
-2.20.1
+2.17.2 (Apple Git-113)
 
