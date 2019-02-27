@@ -29,7 +29,7 @@ source:
     folder: official-binary                                                                 # [win64]
 
 build:
-  number: 3
+  number: 4
   skip: True  # [win and vc<14]
   ignore_run_exports:
     - rhash
