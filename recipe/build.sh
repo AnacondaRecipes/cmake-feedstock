@@ -4,15 +4,15 @@ mkdir build || true
 pushd build
 source "${RECIPE_DIR}/share/cmake.conda/conda-env-vars.sh"
 
-echo "CONDA_CMAKE_DEFAULTS is ${CONDA_CMAKE_DEFAULTS[@]}"
-echo "CONDA_CMAKE_TOOLCHAIN is ${CONDA_CMAKE_TOOLCHAIN[@]}"
+echo "CONDA_CMAKE_DEFAULT_FLAGS is ${CONDA_CMAKE_DEFAULT_FLAGS[@]}"
+echo "CONDA_CMAKE_TOOLCHAIN_FLAGS is ${CONDA_CMAKE_TOOLCHAIN_FLAGS[@]}"
 
 # Remove any --* option as they break building CMake itself
 # .. or to be exact, they do while you are adding
 # the feature and that command-line switch to CMake (--debug-find)
 # Still this serves as an example for filtering CONDA_CMAKE_DEFAULTS.
 declare -a CONDA_CMAKE_DEFAULTS_NO_DASH_DASH_OPTS
-for elem in "${CONDA_CMAKE_DEFAULTS[@]}"; do [[ $elem =~ --.* ]] || CONDA_CMAKE_DEFAULTS_NO_DASH_DASH_OPTS+=("$elem"); done
+for elem in "${CONDA_CMAKE_DEFAULT_FLAGS[@]}"; do [[ $elem =~ --.* ]] || CONDA_CMAKE_DEFAULTS_NO_DASH_DASH_OPTS+=("$elem"); done
 
 # Filter out -I${PREFIX}/include from CXXFLAGS as it causes issues with bad header
 # *and* macro name hygiene around libuv (queue.h / QUEUE etc, urgh).
@@ -33,8 +33,9 @@ fi
   --no-system-jsoncpp \
   --parallel=${CPU_COUNT} \
   -- \
-  "${CONDA_CMAKE_DEFAULTS_NO_DASH_DASH_OPTS[@]}" \
-  "${CONDA_CMAKE_TOOLCHAIN[@]}" \
+  "${CONDA_CMAKE_DEFAULTS_NO_DASH_DASH_OPTS[@]}"  \
+  "${CONDA_CMAKE_TOOLCHAIN_FLAGS[@]}"             \
+  "${CONDA_CMAKE_DEBUG_BS_FLAGS[@]}"              \
   -DCMAKE_USE_SYSTEM_LIBRARY_LIBUV=NO
 make install -j${CPU_COUNT} ${VERBOSE_CM}
 
