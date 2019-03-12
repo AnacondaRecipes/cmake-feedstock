@@ -24,19 +24,30 @@ if [[ "${CFLAGS}" =~ $re ]]; then
   export CFLAGS="${BASH_REMATCH[1]}${BASH_REMATCH[2]}"
 fi
 
-../cmake/bootstrap \
-  --prefix="${PREFIX}" \
-  --system-libs \
-  --no-qt-gui \
-  --no-system-libuv \
-  --no-system-libarchive \
-  --no-system-jsoncpp \
-  --parallel=${CPU_COUNT} \
-  -- \
+declare -a _EXTRA_FLAGS
+if [[ ${target_platform} == osx-64 ]]; then
+  _EXTRA_FLAGS+=(-DCURSES_INCLUDE_DIRS="${PREFIX}"/include)
+  _EXTRA_FLAGS+=(-DCURSES_LIBRARIES="${PREFIX}"/lib/libncurses${SHEXT})
+  _EXTRA_FLAGS+=(-DKWSYS_LFS_WORKS=YES)
+fi
+
+#  "${CONDA_CMAKE_DEBUG_BS_FLAGS[@]}"              \
+
+
+../cmake/bootstrap                                \
+  --prefix="${PREFIX}"                            \
+  --system-libs                                   \
+  --no-qt-gui                                     \
+  --no-system-libuv                               \
+  --no-system-libarchive                          \
+  --no-system-jsoncpp                             \
+  --parallel=${CPU_COUNT}                         \
+  --                                              \
   "${CONDA_CMAKE_DEFAULTS_NO_DASH_DASH_OPTS[@]}"  \
   "${CONDA_CMAKE_TOOLCHAIN_FLAGS[@]}"             \
-  "${CONDA_CMAKE_DEBUG_BS_FLAGS[@]}"              \
-  -DCMAKE_USE_SYSTEM_LIBRARY_LIBUV=NO
+  -DCMAKE_USE_SYSTEM_LIBRARY_LIBUV=NO             \
+  -DBUILD_CursesDialog=YES                        \
+  "${_EXTRA_FLAGS[@]}"
 make install -j${CPU_COUNT} ${VERBOSE_CM}
 
 # Copy conda-cmake config/build meta files.
