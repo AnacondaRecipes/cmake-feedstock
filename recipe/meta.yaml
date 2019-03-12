@@ -33,6 +33,8 @@ build:
   skip: True  # [win and vc<14]
   ignore_run_exports:
     - rhash
+    - libgfortran            # [osx]
+    - libgfortran-ng         # [linux]
 
 requirements:
   build:
