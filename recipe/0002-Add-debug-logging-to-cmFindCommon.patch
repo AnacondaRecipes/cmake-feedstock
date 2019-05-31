@@ -1,7 +1,7 @@
-From 1aa56d4afe268bbc7ef9dc1f0f3735325ce2b439 Mon Sep 17 00:00:00 2001
+From 1bfea7b8d232ab262c49af9d1dad7bbc6728e8cf Mon Sep 17 00:00:00 2001
 From: Ray Donnelly <mingw.android@gmail.com>
 Date: Tue, 26 Feb 2019 18:18:56 +0100
-Subject: [PATCH 2/4] Add debug logging to cmFindCommon*
+Subject: [PATCH 2/2] Add debug logging to cmFindCommon*
 
 And use it from find_library and find_package.
 
@@ -17,20 +17,19 @@ Builds upon work started by Chris Wilson <chris+github@qwirx.com>
  Source/cmFindCommon.cxx         | 23 +++++++++++++
  Source/cmFindCommon.h           | 10 ++++++
  Source/cmFindLibraryCommand.cxx | 59 ++++++++++++++++++++++++++++++---
- Source/cmFindPackageCommand.cxx | 29 ++++++++++++----
- Source/cmFindPackageCommand.h   |  1 -
+ Source/cmFindPackageCommand.cxx | 36 ++++++++++++++++----
  Source/cmServerDictionary.h     |  1 +
  Source/cmServerProtocol.cxx     |  9 +++--
  Source/cmake.cxx                |  4 +++
  Source/cmake.h                  |  5 +++
  Source/cmakemain.cxx            |  1 +
- 12 files changed, 165 insertions(+), 22 deletions(-)
+ 11 files changed, 172 insertions(+), 21 deletions(-)
 
 diff --git a/Help/manual/cmake.1.rst b/Help/manual/cmake.1.rst
-index f3b81ecb68..7b706eda6a 100644
+index 97c65e72ae..dcf92421f0 100644
 --- a/Help/manual/cmake.1.rst
 +++ b/Help/manual/cmake.1.rst
-@@ -210,6 +210,9 @@ Options
+@@ -220,6 +220,9 @@ Options
  ``--debug-output``
   Put cmake in a debug mode.
  
@@ -38,13 +37,13 @@ index f3b81ecb68..7b706eda6a 100644
 + Put cmake find in a debug mode.
 +
   Print extra information during the cmake run like stack traces with
-  message(send_error ) calls.
+  :command:`message(SEND_ERROR)` calls.
  
 diff --git a/Source/cmFindBase.cxx b/Source/cmFindBase.cxx
-index f92f66e239..fdc78ba5ea 100644
+index e5908028f8..3889f5b025 100644
 --- a/Source/cmFindBase.cxx
 +++ b/Source/cmFindBase.cxx
-@@ -108,17 +108,40 @@ bool cmFindBase::ParseArguments(std::vector<std::string> const& argsIn)
+@@ -109,17 +109,40 @@ bool cmFindBase::ParseArguments(std::vector<std::string> const& argsIn)
        this->NoDefaultPath = true;
      } else if (this->CheckCommonArgument(args[j])) {
        doing = DoingNone;
@@ -104,10 +103,10 @@ index f92f66e239..fdc78ba5ea 100644
  }
  
 diff --git a/Source/cmFindCommon.cxx b/Source/cmFindCommon.cxx
-index 9aaa000f9b..596c6e4675 100644
+index 954558f4dc..c2873d67b0 100644
 --- a/Source/cmFindCommon.cxx
 +++ b/Source/cmFindCommon.cxx
-@@ -9,6 +9,8 @@
+@@ -10,6 +10,8 @@
  #include "cmMakefile.h"
  #include "cmSystemTools.h"
  
@@ -116,7 +115,7 @@ index 9aaa000f9b..596c6e4675 100644
  cmFindCommon::PathGroup cmFindCommon::PathGroup::All("ALL");
  cmFindCommon::PathLabel cmFindCommon::PathLabel::PackageRoot(
    "PackageName_ROOT");
-@@ -46,10 +48,31 @@ cmFindCommon::cmFindCommon()
+@@ -47,10 +49,31 @@ cmFindCommon::cmFindCommon()
    this->SearchAppBundleLast = false;
  
    this->InitializeSearchPathGroups();
@@ -142,7 +141,7 @@ index 9aaa000f9b..596c6e4675 100644
 +bool cmFindCommon::DebugModeWanted()
 +{
 +  return this->Makefile->IsOn("CMAKE_FIND_DEBUG_MODE") ||
-+    this->Makefile->GetCMakeInstance()->GetDebugFindOutput();
++    this->Makefile->GetCMakeInstance()->GetDebugFind();
 +}
 +
  void cmFindCommon::InitializeSearchPathGroups()
@@ -336,10 +335,10 @@ index 73d602de71..9685d7f502 100644
      // Switch to searching for this name.
      helper.SetName(n);
 diff --git a/Source/cmFindPackageCommand.cxx b/Source/cmFindPackageCommand.cxx
-index 0d22ed8e77..b359b56561 100644
+index 8eefaa7617..35fc9bbdf6 100644
 --- a/Source/cmFindPackageCommand.cxx
 +++ b/Source/cmFindPackageCommand.cxx
-@@ -156,8 +156,7 @@ bool cmFindPackageCommand::InitialPass(std::vector<std::string> const& args,
+@@ -157,8 +157,7 @@ bool cmFindPackageCommand::InitialPass(std::vector<std::string> const& args,
      this->RequiredCMakeVersion = CMake_VERSION_ENCODE(v[0], v[1], v[2]);
    }
  
@@ -349,46 +348,53 @@ index 0d22ed8e77..b359b56561 100644
  
    // Lookup target architecture, if any.
    if (const char* arch =
-@@ -1154,24 +1153,38 @@ void cmFindPackageCommand::ComputePrefixes()
+@@ -1176,24 +1175,45 @@ void cmFindPackageCommand::ComputePrefixes()
        this->FillPrefixesPackageRoot();
      }
      if (!this->NoCMakePath) {
-+      if (this->DebugMode)
++      if (this->DebugMode) {
 +        this->DebugMessage("FillPrefixesCMakeVariable()\n");
++      }
        this->FillPrefixesCMakeVariable();
      }
      if (!this->NoCMakeEnvironmentPath) {
-+      if (this->DebugMode)
++      if (this->DebugMode) {
 +        this->DebugMessage("FillPrefixesCMakeEnvironment()\n");
++      }
        this->FillPrefixesCMakeEnvironment();
      }
    }
    this->FillPrefixesUserHints();
-+  if (this->DebugMode)
++  if (this->DebugMode) {
 +    this->DebugMessage("FillPrefixesUserHints()\n");
++  }
    if (!this->NoDefaultPath) {
      if (!this->NoSystemEnvironmentPath) {
-+      if (this->DebugMode)
++      if (this->DebugMode) {
 +        this->DebugMessage("FillPrefixesSystemEnvironment()\n");
++      }
        this->FillPrefixesSystemEnvironment();
      }
      if (!this->NoUserRegistry) {
-+      if (this->DebugMode)
++      if (this->DebugMode) {
 +        this->DebugMessage("FillPrefixesUserRegistry()\n");
++      }
        this->FillPrefixesUserRegistry();
      }
      if (!this->NoCMakeSystemPath) {
-+      if (this->DebugMode)
++      if (this->DebugMode) {
 +        this->DebugMessage("FillPrefixesCMakeSystemVariable()\n");
++      }
        this->FillPrefixesCMakeSystemVariable();
      }
      if (!this->NoSystemRegistry) {
-+      if (this->DebugMode)
++      if (this->DebugMode) {
 +        this->DebugMessage("FillPrefixesSystemRegistry()\n");
++      }
        this->FillPrefixesSystemRegistry();
      }
    }
-@@ -1509,7 +1522,8 @@ bool cmFindPackageCommand::FindConfigFile(std::string const& dir,
+@@ -1531,7 +1551,8 @@ bool cmFindPackageCommand::FindConfigFile(std::string const& dir,
      file += "/";
      file += c;
      if (this->DebugMode) {
@@ -398,7 +404,7 @@ index 0d22ed8e77..b359b56561 100644
      }
      if (cmSystemTools::FileExists(file, true) && this->CheckVersion(file)) {
        // Allow resolving symlinks when the config file is found through a link
-@@ -2027,7 +2041,8 @@ bool cmFindPackageCommand::SearchPrefix(std::string const& prefix_in)
+@@ -2049,7 +2070,8 @@ bool cmFindPackageCommand::SearchPrefix(std::string const& prefix_in)
  {
    assert(!prefix_in.empty() && prefix_in.back() == '/');
    if (this->DebugMode) {
@@ -408,7 +414,7 @@ index 0d22ed8e77..b359b56561 100644
    }
  
    // Skip this if the prefix does not exist.
-@@ -2183,7 +2198,8 @@ bool cmFindPackageCommand::SearchFrameworkPrefix(std::string const& prefix_in)
+@@ -2205,7 +2227,8 @@ bool cmFindPackageCommand::SearchFrameworkPrefix(std::string const& prefix_in)
  {
    assert(!prefix_in.empty() && prefix_in.back() == '/');
    if (this->DebugMode) {
@@ -418,7 +424,7 @@ index 0d22ed8e77..b359b56561 100644
    }
  
    // Strip the trailing slash because the path generator is about to
-@@ -2244,7 +2260,8 @@ bool cmFindPackageCommand::SearchAppBundlePrefix(std::string const& prefix_in)
+@@ -2266,7 +2289,8 @@ bool cmFindPackageCommand::SearchAppBundlePrefix(std::string const& prefix_in)
  {
    assert(!prefix_in.empty() && prefix_in.back() == '/');
    if (this->DebugMode) {
@@ -428,114 +434,102 @@ index 0d22ed8e77..b359b56561 100644
    }
  
    // Strip the trailing slash because the path generator is about to
-diff --git a/Source/cmFindPackageCommand.h b/Source/cmFindPackageCommand.h
-index a11d253048..f2ec2ad345 100644
---- a/Source/cmFindPackageCommand.h
-+++ b/Source/cmFindPackageCommand.h
-@@ -174,7 +174,6 @@ private:
-   bool UseFindModules;
-   bool NoUserRegistry;
-   bool NoSystemRegistry;
--  bool DebugMode;
-   bool UseLib32Paths;
-   bool UseLib64Paths;
-   bool UseLibx32Paths;
 diff --git a/Source/cmServerDictionary.h b/Source/cmServerDictionary.h
-index 961e4b7ea8..f452c13ad4 100644
+index 961e4b7ea8..5e4cd6660d 100644
 --- a/Source/cmServerDictionary.h
 +++ b/Source/cmServerDictionary.h
 @@ -33,6 +33,7 @@ static const std::string kCHECK_SYSTEM_VARS_KEY = "checkSystemVars";
  static const std::string kCMAKE_ROOT_DIRECTORY_KEY = "cmakeRootDirectory";
  static const std::string kCOOKIE_KEY = "cookie";
  static const std::string kDEBUG_OUTPUT_KEY = "debugOutput";
-+static const std::string kDEBUG_FIND_OUTPUT_KEY = "debugFindOutput";
++static const std::string kDEBUG_FIND_KEY = "debugFind";
  static const std::string kERROR_MESSAGE_KEY = "errorMessage";
  static const std::string kEXTRA_GENERATOR_KEY = "extraGenerator";
  static const std::string kGENERATOR_KEY = "generator";
 diff --git a/Source/cmServerProtocol.cxx b/Source/cmServerProtocol.cxx
-index 203ee93e42..9a39d4d39a 100644
+index dad88215a8..0eb5ebc7d7 100644
 --- a/Source/cmServerProtocol.cxx
 +++ b/Source/cmServerProtocol.cxx
-@@ -628,6 +628,7 @@ cmServerResponse cmServerProtocol1::ProcessGlobalSettings(
+@@ -633,6 +633,7 @@ cmServerResponse cmServerProtocol1::ProcessGlobalSettings(
    obj[kCAPABILITIES_KEY] = cm->ReportCapabilitiesJson(true);
  
    obj[kDEBUG_OUTPUT_KEY] = cm->GetDebugOutput();
-+  obj[kDEBUG_FIND_OUTPUT_KEY] = cm->GetDebugFindOutput();
++  obj[kDEBUG_FIND_KEY] = cm->GetDebugFind();
    obj[kTRACE_KEY] = cm->GetTrace();
    obj[kTRACE_EXPAND_KEY] = cm->GetTraceExpand();
    obj[kWARN_UNINITIALIZED_KEY] = cm->GetWarnUninitialized();
-@@ -658,9 +659,9 @@ cmServerResponse cmServerProtocol1::ProcessSetGlobalSettings(
+@@ -663,9 +664,9 @@ cmServerResponse cmServerProtocol1::ProcessSetGlobalSettings(
    const cmServerRequest& request)
  {
    const std::vector<std::string> boolValues = {
 -    kDEBUG_OUTPUT_KEY,       kTRACE_KEY,       kTRACE_EXPAND_KEY,
 -    kWARN_UNINITIALIZED_KEY, kWARN_UNUSED_KEY, kWARN_UNUSED_CLI_KEY,
 -    kCHECK_SYSTEM_VARS_KEY
-+    kDEBUG_OUTPUT_KEY,    kDEBUG_FIND_OUTPUT_KEY,  kTRACE_KEY,
++    kDEBUG_OUTPUT_KEY,    kDEBUG_FIND_KEY,         kTRACE_KEY,
 +    kTRACE_EXPAND_KEY,    kWARN_UNINITIALIZED_KEY, kWARN_UNUSED_KEY,
 +    kWARN_UNUSED_CLI_KEY, kCHECK_SYSTEM_VARS_KEY
    };
    for (std::string const& i : boolValues) {
      if (!request.Data[i].isNull() && !request.Data[i].isBool()) {
-@@ -673,6 +674,8 @@ cmServerResponse cmServerProtocol1::ProcessSetGlobalSettings(
+@@ -678,6 +679,8 @@ cmServerResponse cmServerProtocol1::ProcessSetGlobalSettings(
  
    setBool(request, kDEBUG_OUTPUT_KEY,
            [cm](bool e) { cm->SetDebugOutputOn(e); });
-+  setBool(request, kDEBUG_FIND_OUTPUT_KEY,
-+          [cm](bool e) { cm->SetDebugFindOutputOn(e); });
++  setBool(request, kDEBUG_FIND_KEY,
++          [cm](bool e) { cm->SetDebugFindOn(e); });
    setBool(request, kTRACE_KEY, [cm](bool e) { cm->SetTrace(e); });
    setBool(request, kTRACE_EXPAND_KEY, [cm](bool e) { cm->SetTraceExpand(e); });
    setBool(request, kWARN_UNINITIALIZED_KEY,
 diff --git a/Source/cmake.cxx b/Source/cmake.cxx
-index ab783c7da1..b9ecc5360b 100644
+index f0b53f45c9..4837208106 100644
 --- a/Source/cmake.cxx
 +++ b/Source/cmake.cxx
-@@ -138,6 +138,7 @@ cmake::cmake(Role role, cmState::Mode mode)
+@@ -139,6 +139,7 @@ cmake::cmake(Role role, cmState::Mode mode)
    this->WarnUnusedCli = true;
    this->CheckSystemVars = false;
    this->DebugOutput = false;
-+  this->DebugFindOutput = false;
++  this->DebugFind = false;
    this->DebugTryCompile = false;
    this->ClearBuildSystem = false;
-   this->FileComparison = new cmFileTimeComparison;
-@@ -716,6 +717,9 @@ void cmake::SetArgs(const std::vector<std::string>& args)
+   this->FileTimeCache = new cmFileTimeCache;
+@@ -754,6 +755,9 @@ void cmake::SetArgs(const std::vector<std::string>& args)
      } else if (arg.find("--debug-output", 0) == 0) {
        std::cout << "Running with debug output on.\n";
        this->SetDebugOutputOn(true);
-+    } else if (arg.find("--debug-find", 0) == 0) {
-+      std::cout << "Running with debug output on for the `find` commands.\n";
-+      this->SetDebugFindOutputOn(true);
-     } else if (arg.find("--trace-expand", 0) == 0) {
-       std::cout << "Running with expanded trace output on.\n";
-       this->SetTrace(true);
++     } else if (arg.find("--debug-find", 0) == 0) {
++       std::cout << "Running with debug output on for the `find` commands.\n";
++       this->SetDebugFindOn(true);
+     } else if (arg.find("--loglevel=", 0) == 0) {
+       const auto logLevel =
+         StringToLogLevel(arg.substr(sizeof("--loglevel=") - 1));
 diff --git a/Source/cmake.h b/Source/cmake.h
-index 6fa2d3a947..a4ab009d31 100644
+index 4de9d28ea9..328936ec64 100644
 --- a/Source/cmake.h
 +++ b/Source/cmake.h
-@@ -335,6 +335,10 @@ public:
+@@ -359,6 +359,10 @@ public:
    bool GetDebugOutput() { return this->DebugOutput; }
    void SetDebugOutputOn(bool b) { this->DebugOutput = b; }
  
 +  // Do we want debug output from the find commands during the cmake run.
-+  bool GetDebugFindOutput() { return this->DebugFindOutput; }
-+  void SetDebugFindOutputOn(bool b) { this->DebugFindOutput = b; }
++  bool GetDebugFind() { return this->DebugFind; }
++  void SetDebugFindOn(bool b) { this->DebugFind = b; }
 +
    // Do we want trace output during the cmake run.
    bool GetTrace() { return this->Trace; }
    void SetTrace(bool b) { this->Trace = b; }
-@@ -489,6 +493,7 @@ private:
+@@ -516,6 +520,7 @@ private:
    ProgressCallbackType ProgressCallback;
    WorkingMode CurrentWorkingMode;
    bool DebugOutput;
-+  bool DebugFindOutput;
++  bool DebugFind;
    bool Trace;
    bool TraceExpand;
    bool WarnUninitialized;
 diff --git a/Source/cmakemain.cxx b/Source/cmakemain.cxx
-index 09068f8c76..314b9be284 100644
+index 64026ca6e3..92eea4b58d 100644
 --- a/Source/cmakemain.cxx
 +++ b/Source/cmakemain.cxx
-@@ -89,6 +89,7 @@ static const char* cmDocumentationOptions[][2] = {
+@@ -102,6 +102,7 @@ static const char* cmDocumentationOptions[][2] = {
      "Do not delete the try_compile build tree. Only "
      "useful on one try_compile at a time." },
    { "--debug-output", "Put cmake in a debug mode." },
@@ -544,5 +538,5 @@ index 09068f8c76..314b9be284 100644
    { "--trace-expand", "Put cmake in trace mode with variable expansion." },
    { "--trace-source=<file>",
 -- 
-2.17.2 (Apple Git-113)
+2.20.1
 
