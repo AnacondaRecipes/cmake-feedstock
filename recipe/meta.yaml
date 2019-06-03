@@ -1,5 +1,4 @@
-# {% set version = "3.13.4" %}
-{% set version = "3.14.0-rc4" %}
+{% set version = "3.14.0" %}
 {% set major_minor = '.'.join(version.split(".")[:2]) %}
 
 package:
@@ -8,7 +7,7 @@ package:
 
 source:
   - url: https://cmake.org/files/v{{ major_minor }}/cmake-{{ version }}.tar.gz
-    sha256: 8ec90cfaef2b45f70ec04c87ba9f364f90470ee49a14a5af161fead620a81b05
+    sha256: aa76ba67b3c2af1946701f847073f4652af5cbd9f141f221c97af99127e75502
     patches:
       - 0001-librhash-requires-libdl-for-dlopen.patch
       - 0002-Add-debug-logging-to-cmFindCommon.patch
@@ -25,7 +24,7 @@ source:
     folder: official-binary                                                                 # [win32]
 
   - url: https://cmake.org/files/v{{ major_minor }}/cmake-{{ version }}-win64-x64.zip       # [win64]
-    sha256: 6d334ca9b42c3e125889d562cfdb9c43a429b5ab329d33a7ab6e14e559aa7822                # [win64]
+    sha256: 40e8140d68120378262322bbc8c261db8d184d7838423b2e5bf688a6209d3807                # [win64]
     folder: official-binary                                                                 # [win64]
 
 build:
