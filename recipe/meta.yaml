@@ -37,6 +37,7 @@ requirements:
     - make            # [unix]
     - patch           # [not win]
     - m2-patch        # [win]
+    - m2-gcc-libs     # [win]
     - jom             # [win]
     # - git
 
