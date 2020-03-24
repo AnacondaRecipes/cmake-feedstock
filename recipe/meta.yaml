@@ -1,20 +1,21 @@
-<<<<<<< HEAD
 {% set version = "3.19.3" %}
-=======
-{% set version = "3.17.0" %}
->>>>>>> Build in parallel on Windows and update to latest
 
 package:
   name: cmake
   version: {{ version }}
 
 source:
-  url: https://gitlab.kitware.com/cmake/cmake/-/archive/v{{ version }}/cmake-v{{ version }}.tar.bz2
-  sha256: 8bb98e9a54775c231c78423e5b4aacfd05b7afe4fafaa74819d53047138cff0c
-  # Not until Python 3.8 on Windows: https://github.com/WorksApplications/SudachiPy/issues/107#issuecomment-564510365
-  - path: 'W:/src/cmake'
-    path_via_symlink: True
+  - url: https://gitlab.kitware.com/cmake/cmake/-/archive/v{{ version }}/cmake-v{{ version }}.tar.bz2
+    sha256: 8bb98e9a54775c231c78423e5b4aacfd05b7afe4fafaa74819d53047138cff0c
     folder: cmake
+    patches:
+      - patches/git/0001-Add-more-debug-logging-to-cmFindCommon.patch
+  #   - patches/3.16.2/0001-find_-Add-debug-logging-infrastructure.patch
+  #   - patches/3.16.2/0002-find_-Use-debug-logging-infrastructure.patch
+  #   - patches/3.16.2/0003-Add-more-debug-logging-to-cmFindCommon.patch
+  # Not until Python 3.8 on Windows: https://github.com/WorksApplications/SudachiPy/issues/107#issuecomment-564510365
+  # - path: 'W:/src/cmake'
+  #   path_via_symlink: True
   # git_url: 'C:/opt/Shared.local/src/cmake'
   # git_url: 'https://gitlab.kitware.com/cmake/cmake'
   # patches:

@@ -1,9 +1,10 @@
 
 if "%ARCH%"=="32" (set CPU_ARCH=x86) else (set CPU_ARCH=x64)
-set PATH=%CD%\cmake-bin\cmake-%PKG_VERSION%-win%ARCH%-%CPU_ARCH%\bin;%PATH%
+set PATH=%CD%\cmake-bin\bin;%PATH%
 cmake --version
 
-mkdir build && cd build
+mkdir build || true
+cd build
 
 if "%PY_INTERP_DEBUG%" neq "" (
   set CMAKE_CONFIG="Debug"
