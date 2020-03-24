@@ -5,16 +5,17 @@ package:
   version: {{ version }}
 
 source:
-  # url: https://gitlab.kitware.com/cmake/cmake/-/archive/v{{ version }}/cmake-v{{ version }}.tar.bz2
-  # sha256: f50bc274908a4929a06820bfcf12328d201f964bb52f43d4852465d4c7353234
-  # patches:
+  - url: https://gitlab.kitware.com/cmake/cmake/-/archive/v{{ version }}/cmake-v{{ version }}.tar.bz2
+    folder: cmake
+    sha256: 9791a8ff223ffbecc5a8985d4a623be8bff037881356f7147fa616e18c23f8c6
+    patches:
+      - patches/git/0001-Add-more-debug-logging-to-cmFindCommon.patch
   #   - patches/3.16.2/0001-find_-Add-debug-logging-infrastructure.patch
   #   - patches/3.16.2/0002-find_-Use-debug-logging-infrastructure.patch
   #   - patches/3.16.2/0003-Add-more-debug-logging-to-cmFindCommon.patch
   # Not until Python 3.8 on Windows: https://github.com/WorksApplications/SudachiPy/issues/107#issuecomment-564510365
-  - path: 'W:/src/cmake'
-    path_via_symlink: True
-    folder: cmake
+  # - path: 'W:/src/cmake'
+  #   path_via_symlink: True
   # git_url: 'C:/opt/Shared.local/src/cmake'
   # git_url: 'https://gitlab.kitware.com/cmake/cmake'
   # patches:
