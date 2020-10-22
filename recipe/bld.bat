@@ -14,15 +14,17 @@ if "%PY_INTERP_DEBUG%" neq "" (
 
 dir /p %LIBRARY_PREFIX%\lib
 
-
 cmake -LAH -G"NMake Makefiles JOM"                           ^
     -DCMAKE_BUILD_TYPE=%CMAKE_CONFIG%                        ^
     -DCMAKE_FIND_ROOT_PATH="%LIBRARY_PREFIX%"                ^
     -DCMAKE_PREFIX_PATH="%PREFIX%"                           ^
     -DCMAKE_CXX_STANDARD:STRING=17                           ^
     -DCMake_HAVE_CXX_MAKE_UNIQUE:INTERNAL=TRUE               ^
-    -DCMAKE_USE_SCHANNEL:BOOL=ON                             ^
-    -DCURL_WINDOWS_SSPI:BOOL=ON                              ^
+    -DCMAKE_USE_SYSTEM_ZSTD=TRUE                             ^
+    -DCMAKE_USE_SYSTEM_LIBUV=TRUE                            ^
+    -DCMAKE_USE_SYSTEM_LIBLZMA=TRUE                          ^
+    -DCMAKE_USE_SYSTEM_ZLIB=TRUE                             ^
+    -DCMAKE_USE_SYSTEM_BZIP2=TRUE                            ^
     -DCMAKE_INSTALL_PREFIX="%LIBRARY_PREFIX%" ..\cmake
 if errorlevel 1 exit 1
 

@@ -21,14 +21,15 @@ source:
   # patches:
   #   - patches/git/0001-Add-more-debug-logging-to-cmFindCommon.patch
   - url: https://cmake.org/files/v{{ version[:4] }}/cmake-{{ version }}-win32-x86.zip  # [win32]
-    sha256: 66a68a1032ad1853bcff01778ae190cd461d174d6a689e1c646e3e9886f01e0a  # [win32]
+    sha256: 209c7e3cf0eb7e83801858397e48322479eaacbf296b8c02d4d7d4614b1ce5e3  # [win32]
   - url: https://cmake.org/files/v{{ version[:4] }}/cmake-{{ version }}-win64-x64.zip  # [win64]
-    sha256: cf82b1eb20b6fbe583487656fcd496490ffccdfbcbba0f26e19f1c9c63b0b041  # [win64]
-    folder: cmake-bin
+    sha256: 5f4ec834fbd9b62fbf73bc48ed459fa2ea6a86c403106c90fedc2ac76d51612d  # [win64]
+    folder: cmake-bin  # [win]
 
 build:
   number: 0
-  skip: true  # [win and vc<14]
+  skip: True  # [win and vc<14]
+  detect_binary_files_with_prefix: False
   ignore_run_exports:
     - vc
 
@@ -45,14 +46,15 @@ requirements:
     # - git
 
   host:
-    - bzip2           # [unix]
     - libcurl         # [unix]
     - expat           # [unix]
     - ncurses         # [unix]
-    - xz              # [unix]
-    - zlib            # [unix]
-    - libuv           # [unix]
     - rhash           # [unix]
+    - bzip2
+    - xz
+    - zlib
+    - zstd
+    - libuv
 
 test:
   files:
@@ -92,3 +94,4 @@ extra:
     - scopatz
     - tadeu
     - marcelotrevisani
+    - mingwandroid
