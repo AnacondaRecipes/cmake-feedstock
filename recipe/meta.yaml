@@ -1,4 +1,4 @@
-{% set version = "3.18.2" %}
+{% set version = "3.19.3" %}
 
 package:
   name: cmake
@@ -6,7 +6,7 @@ package:
 
 source:
   - url: https://gitlab.kitware.com/cmake/cmake/-/archive/v{{ version }}/cmake-v{{ version }}.tar.bz2
-    sha256: 9f43d4b178d2613c74392532d536913c73e23eedb62ca5e9aa9cfedc6ddee944
+    sha256: 8bb98e9a54775c231c78423e5b4aacfd05b7afe4fafaa74819d53047138cff0c
     folder: cmake
     patches:
       - patches/git/0001-Add-more-debug-logging-to-cmFindCommon.patch
@@ -21,9 +21,9 @@ source:
   # patches:
   #   - patches/git/0001-Add-more-debug-logging-to-cmFindCommon.patch
   - url: https://cmake.org/files/v{{ version[:4] }}/cmake-{{ version }}-win32-x86.zip  # [win32]
-    sha256: 209c7e3cf0eb7e83801858397e48322479eaacbf296b8c02d4d7d4614b1ce5e3  # [win32]
+    sha256: bfde9e17435773e9be36b63a5db88433394ae7f6898a8201ec9a084c7d7ab45c  # [win32]
   - url: https://cmake.org/files/v{{ version[:4] }}/cmake-{{ version }}-win64-x64.zip  # [win64]
-    sha256: 5f4ec834fbd9b62fbf73bc48ed459fa2ea6a86c403106c90fedc2ac76d51612d  # [win64]
+    sha256: 3838e11a0db08f97d687f061882a1e52807010a313f3ac716015b3587ca3f20e  # [win64]
     folder: cmake-bin  # [win]
 
 build:
@@ -42,6 +42,8 @@ requirements:
     - m2-patch        # [win]
     - m2-gcc-libs     # [win]
     - jom             # [win]
+    # - cmake           # [build_platform != target_platform]
+    # - git
 
   host:
     - libcurl         # [unix]
@@ -66,7 +68,7 @@ test:
 
 about:
   home: http://www.cmake.org/
-  license: BSD 3-clause
+  license: BSD-3-Clause
   license_family: BSD
   license_file:
     - cmake/Copyright.txt
