@@ -31,6 +31,7 @@ pushd cmake
         --no-qt-gui \
         --no-system-libarchive \
         --no-system-jsoncpp \
+        --bootstrap-system-libuv \
         --parallel=${CPU_COUNT} \
         -- \
         ${CMAKE_ARGS}
