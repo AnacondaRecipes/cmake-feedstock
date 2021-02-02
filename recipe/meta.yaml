@@ -21,9 +21,9 @@ source:
   # patches:
   #   - patches/git/0001-Add-more-debug-logging-to-cmFindCommon.patch
   - url: https://cmake.org/files/v{{ version[:4] }}/cmake-{{ version }}-win32-x86.zip  # [win32]
-    sha256: bfde9e17435773e9be36b63a5db88433394ae7f6898a8201ec9a084c7d7ab45c  # [win32]
+    sha256: 4d940a0e45bea2b07525add804184f3434684efa2ad72c22b3960933006929e4  # [win32]
   - url: https://cmake.org/files/v{{ version[:4] }}/cmake-{{ version }}-win64-x64.zip  # [win64]
-    sha256: 3838e11a0db08f97d687f061882a1e52807010a313f3ac716015b3587ca3f20e  # [win64]
+    sha256: 24b03daf75ce59b542da38c829fe6944d3bf7cf99afaa8225cf29f7876823899  # [win64]
     folder: cmake-bin  # [win]
 
 build:
