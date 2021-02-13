@@ -27,9 +27,15 @@ source:
     folder: cmake-bin  # [win]
 
 build:
+{% if bootstrapping == 'yes' %}
   number: 0
-  skip: True  # [win and vc<14]
-  detect_binary_files_with_prefix: False
+  string: h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}_bootstrapping
+  script_env:
+    - BOOTSTRAPPING=yes
+{% else %}
+  # Keep above the number of the _bootstrapping package
+  number: 1
+{% endif %}
   ignore_run_exports:
     - vc
 
@@ -40,21 +46,37 @@ requirements:
     - make            # [unix]
     - patch           # [not win]
     - m2-patch        # [win]
-    - m2-gcc-libs     # [win]
-    - jom             # [win]
-    # - cmake           # [build_platform != target_platform]
-    # - git
+{% if bootstrapping != 'yes' %}
+    - cmake           # [build_platform != target_platform]
+{% endif %}
 
   host:
+    - openssl         # [unix]
+    - ncurses         # [unix]
+{% if bootstrapping != 'yes' %}
+    - bzip2           # [unix]
     - libcurl         # [unix]
     - expat           # [unix]
-    - ncurses         # [unix]
+    - xz              # [unix]
+    - zlib            # [unix]
+    - libuv           # [unix]
     - rhash           # [unix]
-    - bzip2
-    - xz
-    - zlib
-    - zstd
-    - libuv
+    - zstd            # [unix]
+{% endif %}
+  run:
+    - openssl         # [unix]
+    - ncurses         # [unix]
+{% if bootstrapping != 'yes' %}
+    - bzip2           # [unix]
+    - libcurl         # [unix]
+    - expat           # [unix]
+    - xz              # [unix]
+    - zlib            # [unix]
+    - libuv           # [unix]
+    - rhash           # [unix]
+    - zstd            # [unix]
+{% endif %}
+    - vs2015_runtime  # [win]
 
 test:
   files:
