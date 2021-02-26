@@ -1,4 +1,4 @@
-{% set version = "3.19.4" %}
+{% set version = "3.19.6" %}
 
 package:
   name: cmake
@@ -6,7 +6,7 @@ package:
 
 source:
   - url: https://gitlab.kitware.com/cmake/cmake/-/archive/v{{ version }}/cmake-v{{ version }}.tar.bz2
-    sha256: 1f7b005c0f71dcc771fe8c0f193dc25745ff715d3a6d598160c5c5df363e1b2b
+    sha256: 7ed798ab8ba99f84b09c1207d3e5db527d9b356a5b3a1d7f8cd759f7dfb8c4a7
     folder: cmake
     patches:
       - patches/git/0001-Add-more-debug-logging-to-cmFindCommon.patch
@@ -21,9 +21,9 @@ source:
   # patches:
   #   - patches/git/0001-Add-more-debug-logging-to-cmFindCommon.patch
   - url: https://cmake.org/files/v{{ version[:4] }}/cmake-{{ version }}-win32-x86.zip  # [win32]
-    sha256: 4d940a0e45bea2b07525add804184f3434684efa2ad72c22b3960933006929e4  # [win32]
+    sha256: 7ed798ab8ba99f84b09c1207d3e5db527d9b356a5b3a1d7f8cd759f7dfb8c4a7  # [win32]
   - url: https://cmake.org/files/v{{ version[:4] }}/cmake-{{ version }}-win64-x64.zip  # [win64]
-    sha256: 24b03daf75ce59b542da38c829fe6944d3bf7cf99afaa8225cf29f7876823899  # [win64]
+    sha256: 7ed798ab8ba99f84b09c1207d3e5db527d9b356a5b3a1d7f8cd759f7dfb8c4a7  # [win64]
     folder: cmake-bin  # [win]
 
 build:
