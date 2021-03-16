@@ -24,17 +24,21 @@ pushd cmake
         -DCMAKE_USE_SYSTEM_LIBRARY_JSONCPP=OFF \
         . || (cat TryRunResults.cmake; false)
   else
+    if [[ $BOOTSTRAPPING == yes ]]; then
+        OPTS='--no-system-libs'
+    else
+        OPTS='--system-libs'
+    fi
     ./bootstrap \
-        --verbose \
-        --prefix="${PREFIX}" \
-        --system-libs \
-        --no-qt-gui \
-        --no-system-libarchive \
-        --no-system-jsoncpp \
-        --bootstrap-system-libuv \
-        --parallel=${CPU_COUNT} \
-        -- \
-        ${CMAKE_ARGS}
+         --verbose \
+         --prefix="${PREFIX}" \
+         $OPTS \
+         --no-qt-gui \
+         --no-system-libarchive \
+         --no-system-jsoncpp \
+         --parallel=${CPU_COUNT} \
+         -- \
+         ${CMAKE_ARGS}
   fi
 
   # CMake automatically selects the highest C++ standard available
