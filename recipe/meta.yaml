@@ -68,6 +68,8 @@ test:
 
 about:
   home: http://www.cmake.org/
+  doc_url: https://cmake.org/documentation/
+  dev_url: https://gitlab.kitware.com/cmake/cmake
   license: BSD-3-Clause
   license_family: BSD
   license_file:
