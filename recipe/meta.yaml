@@ -20,9 +20,9 @@ source:
   # git_url: 'https://gitlab.kitware.com/cmake/cmake'
   # patches:
   #   - patches/git/0001-Add-more-debug-logging-to-cmFindCommon.patch
-  - url: https://cmake.org/files/v{{ version[:4] }}/cmake-{{ version }}-windows_i386.zip  # [win32]
+  - url: https://cmake.org/files/v{{ version[:4] }}/cmake-{{ version }}-windows-i386.zip  # [win32]
     sha256: aa0fdf103ec93ad462a7d37e7b91a2e1739efb947af648c459efed133b70343b  # [win32]
-  - url: https://cmake.org/files/v{{ version[:4] }}/cmake-{{ version }}-windows_x86-64.zip  # [win64]
+  - url: https://cmake.org/files/v{{ version[:4] }}/cmake-{{ version }}-windows-x86_64.zip  # [win64]
     sha256: aa0fdf103ec93ad462a7d37e7b91a2e1739efb947af648c459efed133b70343b  # [win64]
     folder: cmake-bin  # [win]
 
