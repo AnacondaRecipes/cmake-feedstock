@@ -8,8 +8,8 @@ source:
   - url: https://gitlab.kitware.com/cmake/cmake/-/archive/v{{ version }}/cmake-v{{ version }}.tar.bz2
     sha256: aa0fdf103ec93ad462a7d37e7b91a2e1739efb947af648c459efed133b70343b
     folder: cmake
-    patches:
-      - patches/git/0001-Add-more-debug-logging-to-cmFindCommon.patch
+  #  patches:
+  #   - patches/git/0001-Add-more-debug-logging-to-cmFindCommon.patch
   #   - patches/3.16.2/0001-find_-Add-debug-logging-infrastructure.patch
   #   - patches/3.16.2/0002-find_-Use-debug-logging-infrastructure.patch
   #   - patches/3.16.2/0003-Add-more-debug-logging-to-cmFindCommon.patch
@@ -38,13 +38,12 @@ requirements:
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
     - make            # [unix]
-    - patch           # [not win]
-    - m2-patch        # [win]
+  #  - patch           # [not win]
+  #  - m2-patch        # [win]
     - m2-gcc-libs     # [win]
     - jom             # [win]
     # - cmake           # [build_platform != target_platform]
     # - git
-
   host:
     - libcurl         # [unix]
     - expat           # [unix]
