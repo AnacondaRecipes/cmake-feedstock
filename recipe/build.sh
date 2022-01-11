@@ -41,5 +41,10 @@ pushd cmake
 
   make install -j${CPU_COUNT}
 
+  if [[ "${target_platform}" == osx-* ]]; then
+    echo "No removal of .in files for osx ..."
+  else
+    rm -rf $PREFIX/share/cmake-3.22/Modules/Internal/CPack/CPack.OSXScriptLauncher.in
+  fi
 popd
 
