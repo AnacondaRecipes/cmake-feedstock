@@ -1,6 +1,6 @@
 set(FILE_NAME "LICENSE.txt")
 set(DOWNLOAD_URL "https://raw.githubusercontent.com/conda-forge/cmake-feedstock/master/${FILE_NAME}")
-set(EXPECTED_SHA256 "1b17a4bbffec8473f2c0be83f697c2e533f8e1170ed74525ceeee24ddd887afd")
+set(EXPECTED_SHA256 "b5904c52eaee178d332cc0cb2e3795f68af62a72bfb090ea32c493abd88af0d6")
 
 file(DOWNLOAD ${DOWNLOAD_URL} ${CMAKE_CURRENT_BINARY_DIR}/${FILE_NAME}
  SHOW_PROGRESS

@@ -41,5 +41,10 @@ pushd cmake
 
   make install -j${CPU_COUNT}
 
+  # Kludge for conda-build, which tries to detect MacOS binaries on this architecture
+  # and then silently crashes ...
+  if [[ "${target_platform}" == linux-s390x ]]; then
+    rm -rf $PREFIX/share/cmake-3.22/Modules/Internal/CPack/CPack.OSXScriptLauncher.in
+  fi
 popd
 
