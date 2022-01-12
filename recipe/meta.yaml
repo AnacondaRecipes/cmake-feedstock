@@ -50,7 +50,7 @@ test:
     - ccmake --version  # [unix]
 
 about:
-  home: http://www.cmake.org/
+  home: https://cmake.org/
   license: BSD-3-Clause
   license_family: BSD
   license_file:
@@ -65,6 +65,8 @@ about:
     - cmake/Utilities/cmlibarchive/COPYING
     - cmake/Utilities/cmjsoncpp/LICENSE
   summary: CMake is an extensible, open-source system that manages the build process
+  dev_url: https://gitlab.kitware.com/cmake/cmake
+  doc_url: https://cmake.org/documentation/
 
 extra:
   recipe-maintainers:
