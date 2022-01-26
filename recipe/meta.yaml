@@ -1,4 +1,4 @@
-{% set version = "3.22.1" %}
+{% set version = "3.22.2" %}
 
 package:
   name: cmake
@@ -6,12 +6,12 @@ package:
 
 source:
   - url: https://gitlab.kitware.com/cmake/cmake/-/archive/v{{ version }}/cmake-v{{ version }}.tar.bz2
-    sha256: aa0fdf103ec93ad462a7d37e7b91a2e1739efb947af648c459efed133b70343b
+    sha256: 3830b0247269bcc9db247e845e2da687d5b1844a93c12a9922ea637f168e0484
     folder: cmake
   - url: https://cmake.org/files/v{{ version[:4] }}/cmake-{{ version }}-windows-i386.zip  # [win32]
-    sha256: f53494e3b35e5a1177ad55c28763eb5bb45772c1d80778c0f96c45ce4376b6e8  # [win32]
+    sha256: 3830b0247269bcc9db247e845e2da687d5b1844a93c12a9922ea637f168e0484  # [win32]
   - url: https://cmake.org/files/v{{ version[:4] }}/cmake-{{ version }}-windows-x86_64.zip  # [win64]
-    sha256: 35fbbb7d9ffa491834bbc79cdfefc6c360088a3c9bf55c29d111a5afa04cdca3  # [win64]
+    sha256: 3830b0247269bcc9db247e845e2da687d5b1844a93c12a9922ea637f168e0484  # [win64]
     folder: cmake-bin  # [win]
 
 build:
