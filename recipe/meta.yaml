@@ -59,16 +59,16 @@ about:
   license: BSD-3-Clause
   license_family: BSD
   license_file:
-    - cmake/Copyright.txt
-    - cmake/Utilities/cmbzip2/LICENSE         # [win]
-    - cmake/Utilities/cmcurl/COPYING          # [win]
-    - cmake/Utilities/cmexpat/COPYING         # [win]
-    - cmake/Utilities/cmliblzma/COPYING       # [win]
-    - cmake/Utilities/cmzlib/Copyright.txt    # [win]
-    - cmake/Utilities/cmlibuv/LICENSE         # [win]
-    - cmake/Utilities/cmlibrhash/COPYING      # [win]
-    - cmake/Utilities/cmlibarchive/COPYING
-    - cmake/Utilities/cmjsoncpp/LICENSE
+    - Copyright.txt
+    - Utilities/cmbzip2/LICENSE         # [win]
+    - Utilities/cmcurl/COPYING          # [win]
+    - Utilities/cmexpat/COPYING         # [win]
+    - Utilities/cmliblzma/COPYING       # [win]
+    - Utilities/cmzlib/Copyright.txt    # [win]
+    - Utilities/cmlibuv/LICENSE         # [win]
+    - Utilities/cmlibrhash/COPYING      # [win]
+    - Utilities/cmlibarchive/COPYING
+    - Utilities/cmjsoncpp/LICENSE
   summary: CMake is an extensible, open-source system that manages the build process
   description: |
     CMake is a cross-platform, open-source build system generator.
