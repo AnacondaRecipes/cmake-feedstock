@@ -25,7 +25,7 @@ cmake -LAH -G"NMake Makefiles JOM"                           ^
     -DCMAKE_USE_SYSTEM_LIBLZMA=TRUE                          ^
     -DCMAKE_USE_SYSTEM_ZLIB=TRUE                             ^
     -DCMAKE_USE_SYSTEM_BZIP2=TRUE                            ^
-    -DCMAKE_INSTALL_PREFIX="%LIBRARY_PREFIX%" ..\cmake
+    -DCMAKE_INSTALL_PREFIX="%LIBRARY_PREFIX%" ..
 if errorlevel 1 exit 1
 
 cmake --build . --config %CMAKE_CONFIG% --target install
