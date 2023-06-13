@@ -14,7 +14,7 @@ if "%PY_INTERP_DEBUG%" neq "" (
 
 dir /p %LIBRARY_PREFIX%\lib
 
-cmake -LAH -G"NMake Makefiles JOM"                           ^
+cmake -LAH -G"NMake Makefiles"                               ^
     -DCMAKE_BUILD_TYPE=%CMAKE_CONFIG%                        ^
     -DCMAKE_FIND_ROOT_PATH="%LIBRARY_PREFIX%"                ^
     -DCMAKE_PREFIX_PATH="%PREFIX%"                           ^
@@ -25,6 +25,10 @@ cmake -LAH -G"NMake Makefiles JOM"                           ^
     -DCMAKE_USE_SYSTEM_LIBLZMA=TRUE                          ^
     -DCMAKE_USE_SYSTEM_ZLIB=TRUE                             ^
     -DCMAKE_USE_SYSTEM_BZIP2=TRUE                            ^
+    -DZLIB_LIBRARY="%LIBRARY_LIB%/zlib.lib"                  ^
+    -DZLIB_INCLUDE_DIR="%LIBRARY_INC%"                       ^
+    -DLIBLZMA_LIBRARY:FILEPATH="%LIBRARY_LIB%\liblzma.lib"   ^
+    -DBZIP2_INCLUDE_DIR="%LIBRARY_INC%"                      ^
     -DCMAKE_INSTALL_PREFIX="%LIBRARY_PREFIX%" ..
 if errorlevel 1 exit 1
 

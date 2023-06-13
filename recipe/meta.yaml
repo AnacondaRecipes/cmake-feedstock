@@ -25,26 +25,26 @@ requirements:
     - m2-patch        # [win]
 
   host:
-    - bzip2           # [unix]
+    - bzip2           
     - libcurl         # [unix]
     - expat           # [unix]
     - ncurses         # [unix]
-    - xz              # [unix]
-    - zlib            # [unix]
-    - libuv           # [unix]
+    - xz              
+    - zlib {{ zlib }}            
+    - libuv
     - rhash           # [unix]
-    - zstd            # [unix]
+    - zstd {{ zstd }}
 
   run:
-    - bzip2           # [unix]
+    - bzip2
     - libcurl         # [unix]
     - expat           # [unix]
     - ncurses         # [unix]
-    - xz              # [unix]
-    - zlib            # [unix]
-    - libuv           # [unix]
+    - xz
+    - zlib
+    - libuv
     - rhash           # [unix]
-    - zstd            # [unix]
+    - zstd
     - vs2015_runtime  # [win]
 test:
   files:
@@ -54,7 +54,7 @@ test:
     - cmake -V -P SSLTest.cmake
     - ctest --version
     - cpack --version
-    - ccmake --version
+    - ccmake --version  # [unix]
 
 about:
   home: https://cmake.org/
