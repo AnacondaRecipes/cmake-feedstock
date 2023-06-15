@@ -25,7 +25,7 @@ cmake -LAH -G"NMake Makefiles"                               ^
     -DCMAKE_USE_SYSTEM_LIBLZMA=TRUE                          ^
     -DCMAKE_USE_SYSTEM_ZLIB=TRUE                             ^
     -DCMAKE_USE_SYSTEM_BZIP2=TRUE                            ^
-    -DZLIB_LIBRARY="%LIBRARY_LIB%/zlib.lib"                  ^
+    -DZLIB_LIBRARY="%LIBRARY_LIB%\zlib.lib"                  ^
     -DZLIB_INCLUDE_DIR="%LIBRARY_INC%"                       ^
     -DLIBLZMA_LIBRARY:FILEPATH="%LIBRARY_LIB%\liblzma.lib"   ^
     -DBZIP2_INCLUDE_DIR="%LIBRARY_INC%"                      ^
