@@ -20,6 +20,7 @@ requirements:
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
     - cmake-no-system  # [unix]
+    - ninja
 
   host:
     - bzip2

@@ -14,7 +14,7 @@ if "%PY_INTERP_DEBUG%" neq "" (
 
 dir /p %LIBRARY_PREFIX%\lib
 
-cmake -LAH -G"NMake Makefiles"                               ^
+cmake -LAH -G Ninja                                          ^
     -DCMAKE_BUILD_TYPE=%CMAKE_CONFIG%                        ^
     -DCMAKE_FIND_ROOT_PATH="%LIBRARY_PREFIX%"                ^
     -DCMAKE_PREFIX_PATH="%PREFIX%"                           ^
