@@ -19,7 +19,7 @@ requirements:
   build:
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
-    - make            # [unix]
+    - cmake-no-system  # [unix]
 
   host:
     - bzip2
