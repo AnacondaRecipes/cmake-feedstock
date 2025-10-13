@@ -29,7 +29,9 @@ requirements:
     - libcurl {{ libcurl }}  # [unix]
     - expat {{ expat }}  # [unix]
     - ncurses {{ ncurses }}  # [unix]
-    - xz {{ xz }}
+    # latest version 5.6.4 failed on windows with:
+    # missing: LIBLZMA_HAS_AUTO_DECODER LIBLZMA_HAS_EASY_ENCODER LIBLZMA_HAS_LZMA_PRESET
+    - xz ==5.4.6
     - zlib {{ zlib }}
     - libuv {{ libuv }}
     - rhash  # [unix]
@@ -61,16 +63,19 @@ about:
   license: BSD-3-Clause
   license_family: BSD
   license_file:
-    - Copyright.txt
-    - Utilities/cmbzip2/LICENSE         # [win]
-    - Utilities/cmcurl/COPYING          # [win]
-    - Utilities/cmexpat/COPYING         # [win]
-    - Utilities/cmliblzma/COPYING       # [win]
-    - Utilities/cmzlib/Copyright.txt    # [win]
-    - Utilities/cmlibuv/LICENSE         # [win]
-    - Utilities/cmlibrhash/COPYING      # [win]
-    - Utilities/cmlibarchive/COPYING
-    - Utilities/cmjsoncpp/LICENSE
+    - cmake-bin/doc/cmake/cmcppdap/NOTICE  # [win]
+    - cmake-bin/doc/cmake/cmcurl/COPYING  # [win]
+    - cmake-bin/doc/cmake/cmlibarchive/COPYING  # [win]
+    - cmake-bin/doc/cmake/cmliblzma/COPYING  # [win]
+    - cmake-bin/doc/cmake/cmlibrhash/COPYING  # [win]
+    - cmake-bin/doc/cmake/cmlibuv/LICENSE  # [win]
+    - cmake-bin/doc/cmake/cmnghttp2/COPYING  # [win]
+    - cmake-bin/doc/cmake/cmsys/Copyright.txt  # [win]
+    - cmake-bin/doc/cmake/cmzlib/Copyright.txt  # [win]
+    - cmake-bin/doc/cmake/cmzstd/LICENSE  # [win]
+    - LICENSE.rst
+    - Licenses/LGPLv2.1.txt
+    - Licenses/LGPLv3.txt
   summary: CMake is an extensible, open-source system that manages the build process
   description: |
     CMake is a cross-platform, open-source build system generator.
