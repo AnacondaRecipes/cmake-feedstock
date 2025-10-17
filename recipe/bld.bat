@@ -12,6 +12,15 @@ if "%PY_INTERP_DEBUG%" neq "" (
   set CMAKE_CONFIG="Release"
 )
 
+REM latest xz version 5.6.4 failed on windows with:
+REM missing: LIBLZMA_HAS_AUTO_DECODER LIBLZMA_HAS_EASY_ENCODER LIBLZMA_HAS_LZMA_PRESET
+REM The latest xz 5.6.4 for win-64 doesn`t consist of liblzma.lib, now it's called lzma.lib
+if exist "%LIBRARY_PREFIX%\lib\lzma.lib" (
+  if not exist "%LIBRARY_PREFIX%\lib\liblzma.lib" (
+    mklink "%LIBRARY_PREFIX%\lib\liblzma.lib" "%LIBRARY_PREFIX%\lib\lzma.lib"
+  )
+)
+
 dir /p %LIBRARY_PREFIX%\lib
 
 cmake -LAH -G Ninja                                          ^

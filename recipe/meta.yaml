@@ -31,7 +31,7 @@ requirements:
     - ncurses {{ ncurses }}  # [unix]
     # latest xz version 5.6.4 failed on windows with:
     # missing: LIBLZMA_HAS_AUTO_DECODER LIBLZMA_HAS_EASY_ENCODER LIBLZMA_HAS_LZMA_PRESET
-    - xz ==5.4.6
+    - xz {{ xz }}
     - zlib {{ zlib }}
     - libuv {{ libuv }}
     - rhash  # [unix]
