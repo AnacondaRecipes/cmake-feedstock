@@ -7,18 +7,20 @@ package:
 source:
   - url: https://github.com/Kitware/CMake/releases/download/v{{ version }}/cmake-{{ version }}.tar.gz
     sha256: 42abb3f48f37dbd739cdfeb19d3712db0c5935ed5c2aef6c340f9ae9114238a2
-  - url: https://cmake.org/files/v{{ version[:4] }}/cmake-{{ version }}-windows-x86_64.zip  # [win64]
-    sha256: 109c29a744d648863d3637b4963c90088045c8d92799c68c9b9d8713407776c8  # [win64]
-    folder: cmake-bin  # [win]
+  - url: https://github.com/Kitware/CMake/releases/download/v{{ version }}/cmake-{{ version }}-windows-x86_64.zip  # [win and x86_64]
+    sha256: 109c29a744d648863d3637b4963c90088045c8d92799c68c9b9d8713407776c8  # [win and x86_64]
+    folder: cmake-bin  # [win and x86_64]
+  - url: https://github.com/Kitware/CMake/releases/download/v{{ version }}/cmake-{{ version }}-windows-arm64.zip  # [win and arm64]
+    sha256: 909b8c354a96dd261c395e29045e379a3fd41af81ae449c67e66550d59ed43ba  # [win and arm64]
+    folder: cmake-bin  # [win and arm64]
 build:
-  number: 0
+  number: 1
   ignore_run_exports:
     - vc
-  missing_dso_whitelist:  # [s390x]
-    - $RPATH/ld64.so.1    # [s390x] Known s390x `ld64.so` issue.
 
 requirements:
   build:
+    - {{ stdlib('c') }}
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
     - cmake-no-system  # [unix]
