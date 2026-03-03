@@ -14,7 +14,7 @@ source:
     sha256: 909b8c354a96dd261c395e29045e379a3fd41af81ae449c67e66550d59ed43ba  # [win and arm64]
     folder: cmake-bin  # [win and arm64]
 build:
-  number: 1
+  number: 2
   ignore_run_exports:
     - vc
 
