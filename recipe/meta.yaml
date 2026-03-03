@@ -47,7 +47,6 @@ requirements:
     - libuv
     - rhash           # [unix]
     - zstd
-    - vs2015_runtime  # [win]
 test:
   files:
     - SSLTest.cmake
