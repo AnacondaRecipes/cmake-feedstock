@@ -1,20 +1,21 @@
-{% set version = "3.31.2" %}
+{% set name = "cmake" %}
+{% set version = "4.2.3" %}
 
 package:
-  name: cmake
+  name: {{ name }}
   version: {{ version }}
 
 source:
-  - url: https://github.com/Kitware/CMake/releases/download/v{{ version }}/cmake-{{ version }}.tar.gz
-    sha256: 42abb3f48f37dbd739cdfeb19d3712db0c5935ed5c2aef6c340f9ae9114238a2
-  - url: https://github.com/Kitware/CMake/releases/download/v{{ version }}/cmake-{{ version }}-windows-x86_64.zip  # [win and x86_64]
-    sha256: 109c29a744d648863d3637b4963c90088045c8d92799c68c9b9d8713407776c8  # [win and x86_64]
+  - url: https://github.com/Kitware/CMake/releases/download/v{{ version }}/{{ name }}-{{ version }}.tar.gz
+    sha256: 7efaccde8c5a6b2968bad6ce0fe60e19b6e10701a12fce948c2bf79bac8a11e9
+  - url: https://github.com/Kitware/CMake/releases/download/v{{ version }}/{{ name }}-{{ version }}-windows-x86_64.zip  # [win and x86_64]
+    sha256: eb4ebf5155dbb05436d675706b2a08189430df58904257ae5e91bcba4c86933c  # [win and x86_64]
     folder: cmake-bin  # [win and x86_64]
-  - url: https://github.com/Kitware/CMake/releases/download/v{{ version }}/cmake-{{ version }}-windows-arm64.zip  # [win and arm64]
-    sha256: 909b8c354a96dd261c395e29045e379a3fd41af81ae449c67e66550d59ed43ba  # [win and arm64]
+  - url: https://github.com/Kitware/CMake/releases/download/v{{ version }}/{{ name }}-{{ version }}-windows-arm64.zip  # [win and arm64]
+    sha256: 751b206b1cf65151b72c525d26267c1d9beebf8fafc365ae00286571d9fd3ed9  # [win and arm64]
     folder: cmake-bin  # [win and arm64]
 build:
-  number: 2
+  number: 1
   ignore_run_exports:
     - vc
 
@@ -24,19 +25,17 @@ requirements:
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
     - cmake-no-system  # [unix]
-    - ninja
-
+    - ninja-base
   host:
-    - bzip2
-    - libcurl         # [unix]
-    - expat           # [unix]
-    - ncurses         # [unix]
-    - xz
+    - bzip2 {{ bzip2 }}
+    - libcurl {{ libcurl }}  # [unix]
+    - expat {{ expat }}  # [unix]
+    - ncurses {{ ncurses }}  # [unix]
+    - xz {{ xz }}
     - zlib {{ zlib }}
-    - libuv
-    - rhash           # [unix]
+    - libuv {{ libuv }}
+    - rhash  {{ rhash }} # [unix]
     - zstd {{ zstd }}
-
   run:
     - bzip2
     - libcurl         # [unix]
@@ -58,25 +57,28 @@ test:
     - ccmake --version  # [unix]
 
 about:
-  home: https://cmake.org/
+  home: https://cmake.org
   license: BSD-3-Clause
   license_family: BSD
   license_file:
-    - Copyright.txt
-    - Utilities/cmbzip2/LICENSE         # [win]
-    - Utilities/cmcurl/COPYING          # [win]
-    - Utilities/cmexpat/COPYING         # [win]
-    - Utilities/cmliblzma/COPYING       # [win]
-    - Utilities/cmzlib/Copyright.txt    # [win]
-    - Utilities/cmlibuv/LICENSE         # [win]
-    - Utilities/cmlibrhash/COPYING      # [win]
-    - Utilities/cmlibarchive/COPYING
-    - Utilities/cmjsoncpp/LICENSE
+    - cmake-bin/doc/cmake/cmcppdap/NOTICE  # [win]
+    - cmake-bin/doc/cmake/cmcurl/COPYING  # [win]
+    - cmake-bin/doc/cmake/cmlibarchive/COPYING  # [win]
+    - cmake-bin/doc/cmake/cmliblzma/COPYING  # [win]
+    - cmake-bin/doc/cmake/cmlibrhash/COPYING  # [win]
+    - cmake-bin/doc/cmake/cmlibuv/LICENSE  # [win]
+    - cmake-bin/doc/cmake/cmnghttp2/COPYING  # [win]
+    - cmake-bin/doc/cmake/cmsys/Copyright.txt  # [win]
+    - cmake-bin/doc/cmake/cmzlib/Copyright.txt  # [win]
+    - cmake-bin/doc/cmake/cmzstd/LICENSE  # [win]
+    - LICENSE.rst
+    - Licenses/LGPLv2.1.txt
+    - Licenses/LGPLv3.txt
   summary: CMake is an extensible, open-source system that manages the build process
   description: |
     CMake is a cross-platform, open-source build system generator.
   dev_url: https://gitlab.kitware.com/cmake/cmake
-  doc_url: https://cmake.org/documentation/
+  doc_url: https://cmake.org/documentation
 
 extra:
   recipe-maintainers:
