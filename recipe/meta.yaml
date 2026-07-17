@@ -11,6 +11,9 @@ source:
   - url: https://github.com/Kitware/CMake/releases/download/v{{ version }}/{{ name }}-{{ version }}-windows-x86_64.zip  # [win and x86_64]
     sha256: 86e5fcafb38bdf58346a78b187c7b6b4f252ae5242cffe24c463a92bbd2e77d1 # [win and x86_64]
     folder: cmake-bin  # [win and x86_64]
+  - url: https://github.com/Kitware/CMake/releases/download/v{{ version }}/cmake-{{ version }}-windows-arm64.zip  # [win and arm64]
+    sha256: 909b8c354a96dd261c395e29045e379a3fd41af81ae449c67e66550d59ed43ba  # [win and arm64]
+    folder: cmake-bin  # [win and arm64]
 
 build:
   number: 0
