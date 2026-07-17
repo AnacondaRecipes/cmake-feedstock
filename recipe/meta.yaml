@@ -16,7 +16,7 @@ source:
     folder: cmake-bin  # [win and arm64]
 
 build:
-  number: 0
+  number: 1
   ignore_run_exports:
     - vc
 
