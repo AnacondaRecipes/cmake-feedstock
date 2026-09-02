@@ -27,10 +27,10 @@ cmake -LAH -G Ninja                                          ^
     -DCMAKE_USE_SYSTEM_BZIP2=TRUE                            ^
     -DZLIB_LIBRARY="%LIBRARY_LIB%\zlib.lib"                  ^
     -DZLIB_INCLUDE_DIR="%LIBRARY_INC%"                       ^
-    -DLIBLZMA_LIBRARY:FILEPATH="%LIBRARY_LIB%\liblzma.lib"   ^
+    -DLIBLZMA_LIBRARY:FILEPATH="%LIBRARY_LIB%\lzma.lib"      ^
     -DBZIP2_INCLUDE_DIR="%LIBRARY_INC%"                      ^
     -DCMAKE_INSTALL_PREFIX="%LIBRARY_PREFIX%" ..
 if errorlevel 1 exit 1
 
-cmake --build . --config %CMAKE_CONFIG% --target install
+cmake --build . --config %CMAKE_CONFIG% --target install --parallel %CPU_COUNT%
 if errorlevel 1 exit 1

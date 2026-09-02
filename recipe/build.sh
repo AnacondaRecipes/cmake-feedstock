@@ -18,5 +18,5 @@ cmake -LAH -G Ninja ${CMAKE_ARGS} \
     -DBUILD_QtDialog=OFF \
     . || (cat TryRunResults.cmake; false)
 
-cmake --build . --target install -j${CPU_COUNT}
+cmake --build . --target install --parallel ${CPU_COUNT}
 ctest --output-on-failure -j${CPU_COUNT} -R "CTestTestParallel|DOWNLOAD"
