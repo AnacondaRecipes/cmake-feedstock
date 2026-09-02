@@ -32,5 +32,5 @@ cmake -LAH -G Ninja                                          ^
     -DCMAKE_INSTALL_PREFIX="%LIBRARY_PREFIX%" ..
 if errorlevel 1 exit 1
 
-cmake --build . --config %CMAKE_CONFIG% --target install
+cmake --build . --config %CMAKE_CONFIG% --target install --parallel %CPU_COUNT%
 if errorlevel 1 exit 1
